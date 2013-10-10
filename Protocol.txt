@@ -1,0 +1,26 @@
+We need to decide what data should be transmitted from the APM to the arduino.
+
+The taranis can display the following telemetry values:
+Taranis                                   APM					     FrSky protocol
+A1       Analog ports on D receivers
+A2
+Alt      Barometric altitude sensor       barometer                  0x10 int16
+Rpm      Engine speed                     throttle%                  0x03 uint16
+Fuel     Fuel level                       Battery remaining          0x04 uint16
+T1       Temperature sensor 1             sat count and fix          0x02 int16
+T2       Temperature sensor 2             ?APM mode                  0x05 int16
+Spd      GPS Speed                        GPS speed over ground      0x11 uint16 Knots
+Dist     Distance from starting point     distance to last arm       ?
+GAlt     GPS Alt                          GPS altitude               0x01 int16
+Cell     Lowest cell on FLVS-01
+Cels     Sum of all cells on FLVS-01      Battery voltage in V       0x3A uint16
+Vfas     FAS-40/100 voltage measurement   
+Curr     Current                          Battery current in mA      0x28 uint16
+Cnsp     mAh used totalizer (calculated?)               
+Powr     Power (calculated?)
+AccX                                      AccelX                     0x24 int16
+AccY                                      AccelY                     0x25 int16
+AccZ                                      AccelZ                     0x26 int16
+Hdg      Heading                          Compass heading            0x14 uint16
+Vspd     Vertical speed
+										  Latitude                   0x13
