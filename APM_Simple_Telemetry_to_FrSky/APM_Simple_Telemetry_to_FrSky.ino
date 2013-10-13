@@ -273,10 +273,10 @@ byte addBufferData(const char id)
       frskyBuffer[bufferLength + 6] = msByte(temp);
       frskyBuffer[bufferLength + 7] = lsByte(temp);
       
-      frskyBuffer[bufferLength + 4] = header_value;
-      frskyBuffer[bufferLength + 5] = EASTWEST;
-      frskyBuffer[bufferLength + 6] = msByte(eastWest);
-      frskyBuffer[bufferLength + 7] = lsByte(eastWest);
+      frskyBuffer[bufferLength + 8] = header_value;
+      frskyBuffer[bufferLength + 9] = EASTWEST;
+      frskyBuffer[bufferLength + 10] = msByte(eastWest);
+      frskyBuffer[bufferLength + 11] = lsByte(eastWest);
       
       return 12;
       break;
@@ -295,10 +295,10 @@ byte addBufferData(const char id)
       frskyBuffer[bufferLength + 6] = msByte(temp);
       frskyBuffer[bufferLength + 7] = lsByte(temp);
       
-      frskyBuffer[bufferLength + 4] = header_value;
-      frskyBuffer[bufferLength + 5] = NORTHSOUTH;
-      frskyBuffer[bufferLength + 6] = msByte(northSouth);
-      frskyBuffer[bufferLength + 7] = lsByte(northSouth);
+      frskyBuffer[bufferLength + 8] = header_value;
+      frskyBuffer[bufferLength + 9] = NORTHSOUTH;
+      frskyBuffer[bufferLength + 10] = msByte(northSouth);
+      frskyBuffer[bufferLength + 11] = lsByte(northSouth);
       
       return 12;
       break;
@@ -312,10 +312,6 @@ byte addBufferData(const char id)
     case TIME :
     break;
     case SECOND :
-    break;
-    case EASTWEST :
-    break;
-    case NORTHSOUTH :
     break;
     case ACCX :
     break;
