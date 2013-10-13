@@ -1,3 +1,6 @@
+#include <SoftwareSerial.h>
+#include <FlexiTimer2.h>
+
 /*
 0x01  GPS Altitude          M     int16
 0x02  Temperature1          C     int16
@@ -45,8 +48,6 @@
 0x3B   Battery voltage decimal
 
 */
-
-#include <FlexiTimer2.h>
 
 //#define lowByte(w) ((uint8_t) ((w) & 0xff))
 //#define highByte(w) ((uint8_t) ((w) >> 8))
@@ -105,6 +106,10 @@ int16_t accZ = 0;
 uint16_t current = 0;
 int16_t batteryVoltage = 0;
 
+                    //tx, tx
+SoftwareSerial frSky(6,5,true);
+SoftwareSerial debug(12,11);
+
 
 void sendFrSky()
 {
@@ -146,7 +151,6 @@ byte msByte(int16_t value)
 
 byte addBufferData(const char id)
 {
-  int buffLength = 0;
   switch(id) {
     case GPSALT :
     {
@@ -335,6 +339,10 @@ byte writeBuffer(byte length)
 }
 
 void setup() {
+  Serial.begin(57600);
+  debug.begin(38400);                
+  frSky.begin(9600);
+  
   FlexiTimer2::set(200, 1.0/1000, sendFrSky); // call every 200 1ms "ticks"
   FlexiTimer2::start();
 }
