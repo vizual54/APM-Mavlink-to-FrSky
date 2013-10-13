@@ -46,7 +46,7 @@
 
 */
 
-//#include <FlexiTimer2.h>
+#include <FlexiTimer2.h>
 
 //#define lowByte(w) ((uint8_t) ((w) & 0xff))
 //#define highByte(w) ((uint8_t) ((w) >> 8))
@@ -335,9 +335,8 @@ byte writeBuffer(byte length)
 }
 
 void setup() {
-  //FlexiTimer2::set(200, 1.0/1000, sendFrSky); // call every 200 1ms "ticks"
-  //FlexiTimer2::set(500, flash); // MsTimer2 style is also supported
-  //FlexiTimer2::start();
+  FlexiTimer2::set(200, 1.0/1000, sendFrSky); // call every 200 1ms "ticks"
+  FlexiTimer2::start();
 }
 
 void loop() {
