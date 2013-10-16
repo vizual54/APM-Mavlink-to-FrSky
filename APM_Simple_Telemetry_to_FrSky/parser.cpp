@@ -1,8 +1,8 @@
-#include <Arduino.h>
 #include "parser.h"
 
-parser::parser(void)
+parser::parser(SoftwareSerial* port)
 {
+	debugPort = port;
 	f_terms = 0;
 	_state = 0;
 	n = 0;
@@ -10,11 +10,14 @@ parser::parser(void)
 	_nt = 0;
 
         // allocate memory for individual terms of sentence in parser
-	for (int t=0; t<30; t++) {
-		_term[t] = (char*) malloc (15 * sizeof(char));
-		f_term[t] = (char*) malloc (15 * sizeof(char));
+	for (int t=0; t<MAXTERMS; t++) {
+		_term[t] = (char*) malloc (MAXWORD * sizeof(char));
+		f_term[t] = (char*) malloc (MAXWORD * sizeof(char));
 		(f_term[t])[0] = 0;
 	}
+#ifdef DEBUG
+	debugPort->println("parser initialized.");
+#endif
 }
 
 
@@ -24,7 +27,15 @@ parser::~parser(void)
 
 bool parser::parse(char c)
 {
-// LF and CR always reset parser
+  // Dont let sentences run away
+  if ((n >= MAXSENTENCE) || (_terms >= MAXTERMS) || (_nt >= MAXWORD))
+  {
+#ifdef DEBUG
+	  debugPort->println("Runaway sentance. Resetting state.");
+#endif
+	  _state = 0;
+  }
+  // LF and CR always reset parser
   if ((c == 0x0A) || (c == 0x0D))
   {
     _state = 0;
@@ -32,6 +43,9 @@ bool parser::parse(char c)
   // $ Always starts a new sentence
   if (c == '$')
   {
+#ifdef DEBUG
+	 debugPort->println("New sentence.");
+#endif
     _sentence[0] = c;
     _state = 1;
     _terms = 0;
@@ -45,6 +59,9 @@ bool parser::parse(char c)
     case 0 :
     {
       // Waiting for $. Do nothing
+#ifdef DEBUG
+			debugPort->println("Waiting for $.");
+#endif
       break;
     }
     case 1 :
@@ -62,6 +79,9 @@ bool parser::parse(char c)
         // End of sentence
         case '*' :
         {
+#ifdef DEBUG
+			debugPort->println("End of sentence.");
+#endif
           (_term[_terms++])[_nt] = 0;
           _nt = 0;
           _state++;
@@ -69,6 +89,10 @@ bool parser::parse(char c)
         }
         default :
         {
+#ifdef DEBUG
+			debugPort->print("Character decoded: ");
+			debugPort->println(c, DEC);
+#endif
           (_term[_terms])[_nt++] = c;
           break;
         }
@@ -78,6 +102,9 @@ bool parser::parse(char c)
     // Sentence complete
     case 2 :
     {
+#ifdef DEBUG
+	  debugPort->println("Scentence complete. Coping term to f_term.");
+#endif
       // Copy sentence to f_sentece
       while ((--n) >= 0)
       {
@@ -91,9 +118,8 @@ bool parser::parse(char c)
         }
         (f_term[f_terms])[_nt] = 0;
         
-        // Get all values from sentence
-        
       }
+	  _state = 0;
       return 1;
     }
     default :
@@ -104,6 +130,16 @@ bool parser::parse(char c)
   }
 
   return 0;
+}
+
+int parser::terms()
+{
+	return f_terms;
+}
+
+char* parser::term(int i)
+{
+	return f_term[i];
 }
 
 float parser::termToDecimal(int t)

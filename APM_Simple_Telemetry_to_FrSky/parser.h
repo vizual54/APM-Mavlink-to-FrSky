@@ -1,23 +1,34 @@
 #ifndef parser_h
 #define parser_h
 
+#define MAXTERMS 30
+#define MAXSENTENCE 100
+#define MAXWORD 10
+
+#include <SoftwareSerial.h>
+#include <Arduino.h>
+#include "defines.h"
+
 class parser
 {
 public:
-	parser(void);
+	parser(SoftwareSerial* port);
 	~parser(void);
 	bool parse(char c);
+	int terms();
+	char* term(int i);
 	float termToDecimal(int t);
 private:
-	char	f_sentence[100];
-	char*	f_term[30];
-	int		f_terms;
-	int		_state;
-	char	_sentence[100];
-	int		n;
-	int		_terms;
-	char*	_term[30];
-	int		_nt;
+	SoftwareSerial* debugPort; 
+	char	f_sentence[MAXSENTENCE];
+	char*	f_term[MAXTERMS];
+	int	f_terms;
+	int	_state;
+	char	_sentence[MAXSENTENCE];
+	int	n;
+	int	_terms;
+	char*	_term[MAXTERMS];
+	int	_nt;
 };
 
 #endif
