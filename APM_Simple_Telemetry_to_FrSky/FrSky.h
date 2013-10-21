@@ -46,7 +46,8 @@ private:
 		unsigned char	frskyBuffer[48];
 		int				bufferLength;
 		int				counter;
-
+		
+		float gpsDdmToDmdmFormat(float ddm);
 		byte lsByte(int value);
 		byte msByte(int value);
 };
