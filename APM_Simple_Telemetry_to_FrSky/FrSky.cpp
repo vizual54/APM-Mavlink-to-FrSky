@@ -28,6 +28,13 @@ void FrSky::saveValues()
       //batteryVoltage = par->termToDecimal(1);
 }
 
+// We receive the GPS coordinated in ddd.dddd format
+// FrSky wants the dd mm.mmm format so convert.
+float FrSky::gpsDdmToDmdmFormat(float ddm)
+{
+	return 0.0f;
+}
+
 // This is getting called every 200 ms
 void FrSky::sendFrSky()
 {
