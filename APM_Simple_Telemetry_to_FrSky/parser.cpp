@@ -38,6 +38,9 @@ bool parser::parse(char c)
   // LF and CR always reset parser
   if ((c == 0x0A) || (c == 0x0D))
   {
+#ifdef DEBUG
+    debugPort->println("LF or CR received. Resetting state.");
+#endif
     _state = 0;
   }
   // $ Always starts a new sentence
@@ -72,6 +75,9 @@ bool parser::parse(char c)
         // Delimits the terms in sentence
         case ',' :
         {
+#ifdef DEBUG
+          debugPort->println("New Term.");
+#endif
           (_term[_terms++])[_nt] = 0;
           _nt = 0;
           break;
@@ -91,7 +97,7 @@ bool parser::parse(char c)
         {
 #ifdef DEBUG
 			debugPort->print("Character decoded: ");
-			debugPort->println(c, DEC);
+			debugPort->println(c);
 #endif
           (_term[_terms])[_nt++] = c;
           break;

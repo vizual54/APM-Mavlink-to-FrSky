@@ -6,7 +6,6 @@ FrSky::FrSky(SoftwareSerial* serialPort, parser* p)
 	par = p;
 
 	bufferLength = 0;
-	counter = 0;
 }
 
 
@@ -35,11 +34,36 @@ float FrSky::gpsDdmToDmdmFormat(float ddm)
 	return 0.0f;
 }
 
-// This is getting called every 200 ms
-void FrSky::sendFrSky()
+void FrSky::sendFrSky05Hz()
 {
-	counter++;
-	// Send 200 ms frame
+	// Date, Time
+	/*
+	bufferLength += addBufferData(DATE);
+	bufferLength += addBufferData(TIME);
+	frskyBuffer[++bufferLength] = tail_value;
+	bufferLength = writeBuffer(bufferLength);
+	*/
+}
+
+// Send 1000 ms frame
+void FrSky::sendFrSky1Hz()
+{
+	// Course, Latitude, Longitude, Speed, Altitude (GPS), Fuel Level
+	/*
+	bufferLength += addBufferData(COURSE);
+	bufferLength += addBufferData(LATITUDE);
+	bufferLength += addBufferData(LONGITUDE);
+	bufferLength += addBufferData(GPSSPEED);
+	bufferLength += addBufferData(GPSALT);
+	bufferLength += addBufferData(FUEL);
+	frskyBuffer[++bufferLength] = tail_value;
+	bufferLength = writeBuffer(bufferLength);
+	*/
+}
+
+// Send 200 ms frame
+void FrSky::sendFrSky5Hz()
+{
 	// Three-axis Acceleration Values, Altitude (variometer-0.01m), Tempature1, Temprature2, Voltage , Current & Voltage (Ampere Sensor) , RPM
 	bufferLength += addBufferData(ACCX);
 	bufferLength += addBufferData(ACCY);
@@ -53,32 +77,6 @@ void FrSky::sendFrSky()
 	bufferLength += addBufferData(RPM);
 	frskyBuffer[bufferLength++] = tail_value;
 	bufferLength = writeBuffer(bufferLength);
-	
-	if (counter == 5) // Send 1000 ms frame
-	{
-		// Course, Latitude, Longitude, Speed, Altitude (GPS), Fuel Level
-		/*
-		bufferLength += addBufferData(COURSE);
-		bufferLength += addBufferData(LATITUDE);
-		bufferLength += addBufferData(LONGITUDE);
-		bufferLength += addBufferData(GPSSPEED);
-		bufferLength += addBufferData(GPSALT);
-		bufferLength += addBufferData(FUEL);
-		frskyBuffer[++bufferLength] = tail_value;
-		bufferLength = writeBuffer(bufferLength);
-*/
-	}
-	if (counter == 25) // Send 5000 ms frame
-	{
-		// Date, Time
-		/*
-		bufferLength += addBufferData(DATE);
-		bufferLength += addBufferData(TIME);
-		frskyBuffer[++bufferLength] = tail_value;
-		bufferLength = writeBuffer(bufferLength);
-		*/
-		counter = 0;
-	}
 }
 
 byte FrSky::lsByte(int value)
@@ -97,7 +95,7 @@ unsigned char FrSky::addBufferData(const char id)
 	switch(id) {
 		case GPSALT :
 		{
-			float gpsAltitude = par->termToDecimal(7);
+			float gpsAltitude = par->termToDecimal(7) * 1000.0f; //  Main battery voltage in V
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSALT;
 			frskyBuffer[bufferLength + 2] = msByte((int)gpsAltitude);
@@ -116,7 +114,7 @@ unsigned char FrSky::addBufferData(const char id)
 		case TEMP1 :
 		{
 			// APM mode
-			float temp1 = par->termToDecimal(16);
+			float temp1 = par->termToDecimal(15); // 15 APM mode
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP1;
 			frskyBuffer[bufferLength + 2] = msByte(temp1);
@@ -127,8 +125,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case RPM :
 		{
-			//float engineSpeed = par->termToDecimal(??)
-			float engineSpeed = 0.0f;
+			float engineSpeed = par->termToDecimal(17); // Throttle out
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = RPM;
@@ -139,7 +136,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case FUEL :
 		{
-			float fuelLevel = par->termToDecimal(3);
+			float fuelLevel = par->termToDecimal(3); // Battery remaining in %
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = FUEL;
 			if (fuelLevel <= 40)
@@ -168,8 +165,8 @@ unsigned char FrSky::addBufferData(const char id)
 		case TEMP2 :
 		{
 			// GPS status mode, number of satelites in view
-			float nrSats = par->termToDecimal(9);
-			float gpsStatus = par->termToDecimal(4);
+			float nrSats = par->termToDecimal(9);    // GPS Number of satelites in view 
+			float gpsStatus = par->termToDecimal(4); // GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP2;
 			frskyBuffer[bufferLength + 2] = (byte)gpsStatus;
@@ -184,7 +181,8 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case ALTITUDE :
 		{
-			float altitude = par->termToDecimal(14);
+			// Altitude in cm minus Home altitude in cm
+			float altitude = (par->termToDecimal(13) - par->termToDecimal(14)) / 100.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ALTITUDE;
 			frskyBuffer[bufferLength + 2] = msByte((int)altitude);
@@ -201,7 +199,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case GPSSPEED :
 		{
-			float gpsSpeed = par->termToDecimal(10);
+			float gpsSpeed = par->termToDecimal(10) * 0.0194384f; // GPS Ground speed in knots
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSSPEED;
 			frskyBuffer[bufferLength + 2] = msByte((int)gpsSpeed);
@@ -215,31 +213,6 @@ unsigned char FrSky::addBufferData(const char id)
 			frskyBuffer[bufferLength + 7] = lsByte(temp);
       
 			return 8;
-			break;
-		}
-		case LONGITUDE :
-		{
-			float gpsLongitude = par->termToDecimal(6);
-
-			frskyBuffer[bufferLength] = header_value;
-			frskyBuffer[bufferLength + 1] = LONGITUDE;
-			frskyBuffer[bufferLength + 2] = msByte((int)gpsLongitude);
-			frskyBuffer[bufferLength + 3] = lsByte((int)gpsLongitude);
-      
-			unsigned int temp = (unsigned int)((gpsLongitude - (int)gpsLongitude) * 1000.0f);
-    
-			frskyBuffer[bufferLength + 4] = header_value;
-			frskyBuffer[bufferLength + 5] = LONGITUDE + decimal;
-			frskyBuffer[bufferLength + 6] = msByte(temp);
-			frskyBuffer[bufferLength + 7] = lsByte(temp);
-			
-			char eastWest = (gpsLongitude < 0 ) ? 'W' : 'E';
-			frskyBuffer[bufferLength + 8] = header_value;
-			frskyBuffer[bufferLength + 9] = EASTWEST;
-			frskyBuffer[bufferLength + 10] = eastWest;
-			frskyBuffer[bufferLength + 11] = 0;
-      
-			return 12;
 			break;
 		}
 		case LATITUDE :
@@ -267,10 +240,35 @@ unsigned char FrSky::addBufferData(const char id)
 			return 12;
 			break;
 		}
+		case LONGITUDE :
+		{
+			float gpsLongitude = par->termToDecimal(6);
+
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = LONGITUDE;
+			frskyBuffer[bufferLength + 2] = msByte((int)gpsLongitude);
+			frskyBuffer[bufferLength + 3] = lsByte((int)gpsLongitude);
+      
+			unsigned int temp = (unsigned int)((gpsLongitude - (int)gpsLongitude) * 1000.0f);
+    
+			frskyBuffer[bufferLength + 4] = header_value;
+			frskyBuffer[bufferLength + 5] = LONGITUDE + decimal;
+			frskyBuffer[bufferLength + 6] = msByte(temp);
+			frskyBuffer[bufferLength + 7] = lsByte(temp);
+			
+			char eastWest = (gpsLongitude < 0 ) ? 'W' : 'E';
+			frskyBuffer[bufferLength + 8] = header_value;
+			frskyBuffer[bufferLength + 9] = EASTWEST;
+			frskyBuffer[bufferLength + 10] = eastWest;
+			frskyBuffer[bufferLength + 11] = 0;
+      
+			return 12;
+			break;
+		}
 		case COURSE :
 		{
-			//float course = par->termToDecimal(??);
-			float course = 0.0f;
+			float course = (par->termToDecimal(11) / 100.0f); // Course in 1/100 degree
+
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = COURSE;
 			frskyBuffer[bufferLength + 2] = msByte((int)course);
@@ -318,7 +316,7 @@ unsigned char FrSky::addBufferData(const char id)
 	}
 	case ACCX :
 	{
-		//float accX = par->termToDecimal(??);
+		//float accX = par->termToDecimal(18) / 100.0f;
 		float accX = 0.0f;
 		frskyBuffer[bufferLength] = header_value;
 		frskyBuffer[bufferLength + 1] = ACCX;
@@ -329,7 +327,7 @@ unsigned char FrSky::addBufferData(const char id)
 	}
 	case ACCY :
 	{
-		//float accY = par->termToDecimal(??);
+		//float accY = par->termToDecimal(19) / 100.0f;
 		float accY = 0.0f;
 		frskyBuffer[bufferLength] = header_value;
 		frskyBuffer[bufferLength + 1] = ACCY;
@@ -340,7 +338,7 @@ unsigned char FrSky::addBufferData(const char id)
 	}
 	case ACCZ :
 	{
-		//float accZ = par->termToDecimal(??);
+		//float accZ = par->termToDecimal(20) / 100.0f;
 		float accZ = 0.0f;
 		frskyBuffer[bufferLength] = header_value;
 		frskyBuffer[bufferLength + 1] = ACCZ;

@@ -14,9 +14,10 @@ FrSky *frSky;
 SoftwareSerial *debugSerial;
 SoftwareSerial *frSkySerial;
 
-long hbMillis;
-byte hbState;
-bool firstParse = false;
+int		counter = 0;
+long	hbMillis;
+byte	hbState;
+bool	firstParse = false;
 
 void setup() {
 	// Debug serial port pin 11 tx, 12 rx
@@ -35,6 +36,9 @@ void setup() {
 	
 #ifdef DEBUG
 	debugSerial->println("Initializing...");
+	debugSerial->print("Free ram: ");
+	debugSerial->print(freeRam());
+	debugSerial->println(" bytes");
 #endif
 	
 	p = new parser(debugSerial);
@@ -55,7 +59,7 @@ void setup() {
 #endif
 
 	// Blink fast a couple of times to wait for the APM to boot
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 200; i++)
 	{
 		if (i % 2)
 		{
@@ -72,6 +76,9 @@ void setup() {
 
 #ifdef DEBUG
 	debugSerial->println("Initialization done.");
+	debugSerial->print("Free ram: ");
+	debugSerial->print(freeRam());
+	debugSerial->println(" bytes");
 #endif
 }
 
@@ -100,20 +107,32 @@ void updateHeartbeat()
 
 void sendFrSkyData()
 {
+	counter++;
 	if (firstParse)
-		frSky->sendFrSky();
+	{
+		if (counter == 25)			// Send 5000 ms frame
+		{
+			frSky->sendFrSky05Hz();
+			counter = 0;
+		}
+		else if (counter == 5)		// Send 1000 ms frame
+		{
+			frSky->sendFrSky1Hz();
+		}
+		else						// Send 200 ms frame
+		{
+			frSky->sendFrSky5Hz();
+		}
+		
+	}
 }
 
 void readApmData()
 {  
 	while (Serial.available() > 0)
-	{
-		//debugSerial->println("bla bla");
-		debugSerial->println(Serial.available());
-		//char temp = Serial.read();
-		// Parse the motherfucker 
+	{ 
 		bool done = p->parse(Serial.read());
-		
+
 		if (done && !firstParse)
 		{
 			firstParse = true;
@@ -121,6 +140,7 @@ void readApmData()
 			debugSerial->println("First parse done. Start sending on frSky port.");
 #endif
 		}
+
 #ifdef DEBUG
 		if (done)
 			frSky->printValues(debugSerial);
@@ -129,7 +149,11 @@ void readApmData()
 }
 
 
-
+int freeRam () {
+  extern int __heap_start, *__brkval; 
+  int v; 
+  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+}
 
 
 
