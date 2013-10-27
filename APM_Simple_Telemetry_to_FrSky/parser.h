@@ -1,8 +1,8 @@
 #ifndef parser_h
 #define parser_h
 
-#define MAXTERMS 25
-#define MAXSENTENCE 120
+#define MAXTERMS 21
+#define MAXSENTENCE 110
 #define MAXWORD 10
 
 #include <SoftwareSerial.h>

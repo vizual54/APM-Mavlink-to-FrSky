@@ -2,6 +2,7 @@
 #include <FlexiTimer2.h>
 #include "parser.h"
 #include "FrSky.h"
+#include "SimpleFIFO.h"
 
 #define HEARTBEATLED 13
 #define HEARTBEATFREQ 500
@@ -13,6 +14,7 @@ parser *p;
 FrSky *frSky;
 SoftwareSerial *debugSerial;
 SoftwareSerial *frSkySerial;
+SimpleFIFO<char, 128> queue;
 
 int		counter = 0;
 long	hbMillis;
@@ -83,8 +85,20 @@ void setup() {
 }
 
 void loop() {
-	// put your main code here, to run repeatedly: 
-	readApmData();
+	
+	while (Serial.available() > 0)
+	{
+		if (queue.count() < 128)
+		{
+			queue.enqueue(Serial.read());	
+		}
+		else
+		{
+			debugSerial->println("QUEUE IS FULL!");
+		}
+	}
+	
+	processData();
 	updateHeartbeat();
 }
 
@@ -127,11 +141,11 @@ void sendFrSkyData()
 	}
 }
 
-void readApmData()
+void processData()
 {  
-	while (Serial.available() > 0)
+	while (queue.count() > 0)
 	{ 
-		bool done = p->parse(Serial.read());
+		bool done = p->parse(queue.dequeue());
 
 		if (done && !firstParse)
 		{
@@ -142,7 +156,7 @@ void readApmData()
 		}
 
 #ifdef DEBUG
-		if (done)
+		if (done && firstParse)
 			frSky->printValues(debugSerial);
 #endif
 	}

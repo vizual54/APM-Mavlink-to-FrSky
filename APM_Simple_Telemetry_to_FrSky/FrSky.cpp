@@ -27,11 +27,16 @@ void FrSky::saveValues()
       //batteryVoltage = par->termToDecimal(1);
 }
 
-// We receive the GPS coordinated in ddd.dddd format
+// We receive the GPS coordinates in ddd.dddd format
 // FrSky wants the dd mm.mmm format so convert.
-float FrSky::gpsDdmToDmdmFormat(float ddm)
+float FrSky::gpsDdToDmsFormat(float ddm)
 {
-	return 0.0f;
+	//int dd = (int)ddm;
+
+	float dec_mm = (ddm - (int)ddm) * 60.0f;
+	int mm = (int)dec_mm;
+	int ss = (int)((dec_mm - mm) * 60.0f);
+	return ((int)ddm * 100.0f) + mm + ss / 100.0f;
 }
 
 void FrSky::sendFrSky05Hz()
@@ -217,7 +222,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case LATITUDE :
 		{
-			float gpsLatitude = par->termToDecimal(5)  / 10000000.0f;;
+			float gpsLatitude = gpsDdToDmsFormat(par->termToDecimal(5) / 10000000.0f);
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = LATITUDE;
@@ -242,7 +247,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case LONGITUDE :
 		{
-			float gpsLongitude = par->termToDecimal(6);
+			float gpsLongitude = gpsDdToDmsFormat(par->termToDecimal(6) / 10000000.0f);
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = LONGITUDE;
@@ -424,23 +429,36 @@ unsigned char FrSky::writeBuffer(const int length)
 
 void FrSky::printValues(SoftwareSerial* debugPort)
 {
-  
-	debugPort->print("GPS Alt: ");
-	debugPort->print(par->termToDecimal(7), 2);
-	debugPort->print(" Fuel: ");
-	debugPort->print(par->termToDecimal(3), 2);
-	debugPort->print(" Alt: ");
-	debugPort->print(par->termToDecimal(14), 2);
-	debugPort->print(" GPS Speed: ");
-	debugPort->print(par->termToDecimal(10), 2);
-	debugPort->print(" Latitude: ");
-	debugPort->print(par->termToDecimal(5), 2);
-	debugPort->print(" Longitude: ");
-	debugPort->print(par->termToDecimal(6), 2);
+	
+	debugPort->print("Voltage: ");
+	debugPort->print(par->termToDecimal(1), 2);
 	debugPort->print(" Current: ");
 	debugPort->print(par->termToDecimal(2), 2);
-	debugPort->print(" Voltage: ");
-	debugPort->print(par->termToDecimal(1), 2);
+	debugPort->print(" Fuel: ");
+	debugPort->print(par->termToDecimal(3), 2);
+	debugPort->print(" GPS status: ");
+	debugPort->print((byte)par->termToDecimal(4), 2);
+	debugPort->print(" Latitude: ");
+	debugPort->print(gpsDdToDmsFormat(par->termToDecimal(5) / 10000000.0f), 2);
+	debugPort->print(" Longitude: ");
+	debugPort->print(gpsDdToDmsFormat(par->termToDecimal(6) / 10000000.0f), 2);
+	debugPort->print(" GPS Alt: ");
+	debugPort->print(par->termToDecimal(7), 2);
+	debugPort->print(" GPS hdop: ");
+	debugPort->print(par->termToDecimal(8), 2);
+	debugPort->print(" GPS sats: ");
+	debugPort->print((int)par->termToDecimal(9));
+	debugPort->print(" GPS speed: ");
+	debugPort->print(par->termToDecimal(10) * 0.0194384f, 2);
+	debugPort->print(" Course: ");
+	debugPort->print(par->termToDecimal(11), 2);
+	debugPort->print(" Course: ");
+	debugPort->print(par->termToDecimal(12), 2);
+	debugPort->print(" Alt: ");
+	debugPort->print(par->termToDecimal(13) - par->termToDecimal(14), 2);
+	debugPort->print(" Mode: ");
+	debugPort->print((int)par->termToDecimal(15));
+	debugPort->print(" Course: ");
+	debugPort->print(par->termToDecimal(16), 2);
 	debugPort->println("");
-
 }

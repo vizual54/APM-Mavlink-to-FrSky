@@ -52,7 +52,7 @@ private:
 		unsigned char	frskyBuffer[48];
 		int				bufferLength;
 		
-		float gpsDdmToDmdmFormat(float ddm);
+		float gpsDdToDmsFormat(float ddm);
 		byte lsByte(int value);
 		byte msByte(int value);
 };

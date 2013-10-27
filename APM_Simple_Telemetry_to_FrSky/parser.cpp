@@ -31,9 +31,19 @@ bool parser::parse(char c)
   if ((n >= MAXSENTENCE) || (_terms >= MAXTERMS) || (_nt >= MAXWORD))
   {
 #ifdef DEBUG
-	  debugPort->println("Runaway sentance. Resetting state.");
+	  debugPort->println("Runaway sentance. Resetting state. ");
+	  debugPort->print("Sentence is: ");
+	  debugPort->print(n);
+	  debugPort->print(" chars ");
+	  debugPort->print(_terms);
+	  debugPort->print(" terms ");
+	  debugPort->print(_nt);
+	  debugPort->println(" words.");
 #endif
 	  _state = 0;
+	  n = 0;
+	  _terms = 0;
+	  _nt = 0;
   }
   // LF and CR always reset parser
   if ((c == 0x0A) || (c == 0x0D))
@@ -76,7 +86,7 @@ bool parser::parse(char c)
         case ',' :
         {
 #ifdef DEBUG
-          debugPort->println("New Term.");
+          debugPort->print(",");
 #endif
           (_term[_terms++])[_nt] = 0;
           _nt = 0;
@@ -86,7 +96,7 @@ bool parser::parse(char c)
         case '*' :
         {
 #ifdef DEBUG
-			debugPort->println("End of sentence.");
+			debugPort->println("*");
 #endif
           (_term[_terms++])[_nt] = 0;
           _nt = 0;
@@ -96,8 +106,7 @@ bool parser::parse(char c)
         default :
         {
 #ifdef DEBUG
-			debugPort->print("Character decoded: ");
-			debugPort->println(c);
+			debugPort->print(c);
 #endif
           (_term[_terms])[_nt++] = c;
           break;
