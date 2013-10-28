@@ -8,7 +8,7 @@
 #define HEARTBEATFREQ 500
 
 //#define DEBUG
-#define DEBUGFRSKY
+//#define DEBUGFRSKY
 
 parser *p;
 FrSky *frSky;
@@ -22,13 +22,13 @@ byte	hbState;
 bool	firstParse = false;
 
 void setup() {
-	// Debug serial port pin 11 tx, 12 rx
+	// Debug serial port pin 11 rx, 12 tx
 	debugSerial = new SoftwareSerial(12, 11);
 	debugSerial->begin(38400);
-	// FrSky data port pin 6 tx, 5 rx
+	// FrSky data port pin 6 rx, 5 tx
 #ifdef DEBUGFRSKY
 	frSkySerial = new SoftwareSerial(6, 5);
-#elif
+#else
 	frSkySerial = new SoftwareSerial(6, 5, true);
 #endif
 	frSkySerial->begin(9600);
