@@ -100,7 +100,7 @@ unsigned char FrSky::addBufferData(const char id)
 	switch(id) {
 		case GPSALT :
 		{
-			float gpsAltitude = par->termToDecimal(7) * 1000.0f; //  Main battery voltage in V
+			float gpsAltitude = par->termToDecimal(6) * 1000.0f; //  Main battery voltage in V
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSALT;
 			frskyBuffer[bufferLength + 2] = msByte((int)gpsAltitude);
@@ -119,7 +119,7 @@ unsigned char FrSky::addBufferData(const char id)
 		case TEMP1 :
 		{
 			// APM mode
-			float temp1 = par->termToDecimal(15); // 15 APM mode
+			float temp1 = par->termToDecimal(14); // 15 APM mode
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP1;
 			frskyBuffer[bufferLength + 2] = msByte(temp1);
@@ -130,7 +130,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case RPM :
 		{
-			float engineSpeed = par->termToDecimal(17); // Throttle out
+			float engineSpeed = par->termToDecimal(16); // Throttle out
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = RPM;
@@ -141,7 +141,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case FUEL :
 		{
-			float fuelLevel = par->termToDecimal(3); // Battery remaining in %
+			float fuelLevel = par->termToDecimal(2); // Battery remaining in %
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = FUEL;
 			if (fuelLevel <= 40)
@@ -170,7 +170,7 @@ unsigned char FrSky::addBufferData(const char id)
 		case TEMP2 :
 		{
 			// GPS status mode, number of satelites in view
-			float nrSats = par->termToDecimal(9);    // GPS Number of satelites in view 
+			float nrSats = par->termToDecimal(8);    // GPS Number of satelites in view 
 			float gpsStatus = par->termToDecimal(4); // GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP2;
@@ -187,7 +187,7 @@ unsigned char FrSky::addBufferData(const char id)
 		case ALTITUDE :
 		{
 			// Altitude in cm minus Home altitude in cm
-			float altitude = (par->termToDecimal(13) - par->termToDecimal(14)) / 100.0f;
+			float altitude = (par->termToDecimal(12) - par->termToDecimal(14)) / 100.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ALTITUDE;
 			frskyBuffer[bufferLength + 2] = msByte((int)altitude);
@@ -204,7 +204,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case GPSSPEED :
 		{
-			float gpsSpeed = par->termToDecimal(10) * 0.0194384f; // GPS Ground speed in knots
+			float gpsSpeed = par->termToDecimal(9) * 0.0194384f; // GPS Ground speed in knots
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSSPEED;
 			frskyBuffer[bufferLength + 2] = msByte((int)gpsSpeed);
@@ -222,7 +222,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case LATITUDE :
 		{
-			float gpsLatitude = gpsDdToDmsFormat(par->termToDecimal(5) / 10000000.0f);
+			float gpsLatitude = gpsDdToDmsFormat(par->termToDecimal(4) / 10000000.0f);
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = LATITUDE;
@@ -247,7 +247,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case LONGITUDE :
 		{
-			float gpsLongitude = gpsDdToDmsFormat(par->termToDecimal(6) / 10000000.0f);
+			float gpsLongitude = gpsDdToDmsFormat(par->termToDecimal(5) / 10000000.0f);
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = LONGITUDE;
@@ -272,7 +272,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case COURSE :
 		{
-			float course = (par->termToDecimal(11) / 100.0f); // Course in 1/100 degree
+			float course = (par->termToDecimal(10) / 100.0f); // Course in 1/100 degree
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = COURSE;
@@ -321,7 +321,7 @@ unsigned char FrSky::addBufferData(const char id)
 	}
 	case ACCX :
 	{
-		//float accX = par->termToDecimal(18) / 100.0f;
+		//float accX = par->termToDecimal(17) / 100.0f;
 		float accX = 0.0f;
 		frskyBuffer[bufferLength] = header_value;
 		frskyBuffer[bufferLength + 1] = ACCX;
@@ -332,7 +332,7 @@ unsigned char FrSky::addBufferData(const char id)
 	}
 	case ACCY :
 	{
-		//float accY = par->termToDecimal(19) / 100.0f;
+		//float accY = par->termToDecimal(18) / 100.0f;
 		float accY = 0.0f;
 		frskyBuffer[bufferLength] = header_value;
 		frskyBuffer[bufferLength + 1] = ACCY;
@@ -343,7 +343,7 @@ unsigned char FrSky::addBufferData(const char id)
 	}
 	case ACCZ :
 	{
-		//float accZ = par->termToDecimal(20) / 100.0f;
+		//float accZ = par->termToDecimal(19) / 100.0f;
 		float accZ = 0.0f;
 		frskyBuffer[bufferLength] = header_value;
 		frskyBuffer[bufferLength + 1] = ACCZ;
@@ -354,7 +354,7 @@ unsigned char FrSky::addBufferData(const char id)
 	}
 	case CURRENT :
 	{
-		float current = par->termToDecimal(2);
+		float current = par->termToDecimal(1);
 		frskyBuffer[bufferLength] = header_value;
 		frskyBuffer[bufferLength + 1] = CURRENT;
 		frskyBuffer[bufferLength + 2] = msByte((int)(current*100.0f));
@@ -364,7 +364,7 @@ unsigned char FrSky::addBufferData(const char id)
 	}
 	case VOLTAGE :
 	{
-		float batteryVoltage = par->termToDecimal(1);
+		float batteryVoltage = par->termToDecimal(0);
 		frskyBuffer[bufferLength] = header_value;
 		frskyBuffer[bufferLength + 1] = VOLTAGE;
 		frskyBuffer[bufferLength + 2] = msByte((int)batteryVoltage);
@@ -431,34 +431,32 @@ void FrSky::printValues(SoftwareSerial* debugPort)
 {
 	
 	debugPort->print("Voltage: ");
-	debugPort->print(par->termToDecimal(1), 2);
+	debugPort->print(par->termToDecimal(0), 2);
 	debugPort->print(" Current: ");
-	debugPort->print(par->termToDecimal(2), 2);
+	debugPort->print(par->termToDecimal(1) / 100.0f, 2);
 	debugPort->print(" Fuel: ");
-	debugPort->print(par->termToDecimal(3), 2);
+	debugPort->print(par->termToDecimal(2), 2);
 	debugPort->print(" GPS status: ");
-	debugPort->print((byte)par->termToDecimal(4), 2);
+	debugPort->print((int)par->termToDecimal(3));
 	debugPort->print(" Latitude: ");
-	debugPort->print(gpsDdToDmsFormat(par->termToDecimal(5) / 10000000.0f), 2);
+	debugPort->print(gpsDdToDmsFormat(par->termToDecimal(4) / 10000000.0f), 2);
 	debugPort->print(" Longitude: ");
-	debugPort->print(gpsDdToDmsFormat(par->termToDecimal(6) / 10000000.0f), 2);
+	debugPort->print(gpsDdToDmsFormat(par->termToDecimal(5) / 10000000.0f), 2);
 	debugPort->print(" GPS Alt: ");
-	debugPort->print(par->termToDecimal(7), 2);
+	debugPort->print(par->termToDecimal(6) / 100.0f, 2);
 	debugPort->print(" GPS hdop: ");
-	debugPort->print(par->termToDecimal(8), 2);
+	debugPort->print(par->termToDecimal(7) / 100.0f, 2);
 	debugPort->print(" GPS sats: ");
-	debugPort->print((int)par->termToDecimal(9));
+	debugPort->print((int)par->termToDecimal(8));
 	debugPort->print(" GPS speed: ");
-	debugPort->print(par->termToDecimal(10) * 0.0194384f, 2);
-	debugPort->print(" Course: ");
-	debugPort->print(par->termToDecimal(11), 2);
-	debugPort->print(" Course: ");
-	debugPort->print(par->termToDecimal(12), 2);
-	debugPort->print(" Alt: ");
-	debugPort->print(par->termToDecimal(13) - par->termToDecimal(14), 2);
+	debugPort->print(par->termToDecimal(9) * 0.0194384f, 2);
+	debugPort->print(" GPS Course: ");
+	debugPort->print(par->termToDecimal(10) / 100.0f, 2);
+	debugPort->print(" Home alt: ");
+	debugPort->print((par->termToDecimal(11) - par->termToDecimal(12)) / 100.0f, 2);
 	debugPort->print(" Mode: ");
-	debugPort->print((int)par->termToDecimal(15));
+	debugPort->print((int)par->termToDecimal(13));
 	debugPort->print(" Course: ");
-	debugPort->print(par->termToDecimal(16), 2);
+	debugPort->print(par->termToDecimal(14) / 100.0f, 2);
 	debugPort->println("");
 }

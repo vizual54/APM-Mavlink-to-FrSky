@@ -19,16 +19,18 @@ public:
 	char* term(int i);
 	float termToDecimal(int t);
 private:
+	int _dehex(char a);
 	SoftwareSerial* debugPort; 
-	char	f_sentence[MAXSENTENCE];
 	char*	f_term[MAXTERMS];
 	int	f_terms;
 	int	_state;
-	char	_sentence[MAXSENTENCE];
+	//char	_sentence[MAXSENTENCE];
 	int	n;
 	int	_terms;
 	char*	_term[MAXTERMS];
 	int	_nt;
+	int checksum;
+	int _checksum;
 };
 
 #endif

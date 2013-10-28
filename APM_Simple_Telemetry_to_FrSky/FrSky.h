@@ -9,27 +9,26 @@
 #include "defines.h"
 
 // The following data is sent from APM
-// 0  $ - Header
-// 1  Main battery voltage in V              
-// 2  Battery current in mA                  
-// 3  Battery remaining in %                 
-// 4  GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
-// 5  GPS Latitude in decimal degrees        
-// 6  GPS Longitude in decimal degrees       
-// 7  GPS Altitude in cm                     
-// 8  GPS hdop                               
-// 9  GPS Number of satelites in view        
-// 10 GPS Ground speed in cm/s               
-// 11 Course in 1/100 degree                 
-// 12 Distance to arm position in cm         
-// 13 Altitude in cm         
-// 14 Home altitude in cm    
-// 15 APM mode                               
-// 16 Compass                                
-// 17 Throttle out           
-// 18 Accel-X
-// 19 Accel-Y
-// 20 Accel-Z
+//   $ - Header
+// 0  Main battery voltage in V              
+// 1  Battery current in mA                  
+// 2  Battery remaining in %                 
+// 3  GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
+// 4  GPS Latitude in decimal degrees        
+// 5  GPS Longitude in decimal degrees       
+// 6  GPS Altitude in cm                     
+// 7  GPS hdop                               
+// 8  GPS Number of satelites in view        
+// 9  GPS Ground speed in cm/s               
+// 10 GPS Course in 1/100 degree                 
+// 11 Altitude in cm         
+// 12 Home altitude in cm    
+// 14 APM mode                               
+// 15 Compass                                
+// 16 Throttle out           
+// 17 Accel-X
+// 18 Accel-Y
+// 19 Accel-Z
 // * - end
 
 class FrSky

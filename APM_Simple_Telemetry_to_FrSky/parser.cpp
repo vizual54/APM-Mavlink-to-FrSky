@@ -27,121 +27,142 @@ parser::~parser(void)
 
 bool parser::parse(char c)
 {
-  // Dont let sentences run away
-  if ((n >= MAXSENTENCE) || (_terms >= MAXTERMS) || (_nt >= MAXWORD))
-  {
+	// Dont let sentences run away
+	if ((n >= MAXSENTENCE) || (_terms >= MAXTERMS) || (_nt >= MAXWORD))
+	{
 #ifdef DEBUG
-	  debugPort->println("Runaway sentance. Resetting state. ");
-	  debugPort->print("Sentence is: ");
-	  debugPort->print(n);
-	  debugPort->print(" chars ");
-	  debugPort->print(_terms);
-	  debugPort->print(" terms ");
-	  debugPort->print(_nt);
-	  debugPort->println(" words.");
+		debugPort->println("Runaway sentance. Resetting state. ");
+		debugPort->print("Sentence is: ");
+		debugPort->print(n);
+		debugPort->print(" chars ");
+		debugPort->print(_terms);
+		debugPort->print(" terms ");
+		debugPort->print(_nt);
+		debugPort->println(" words.");
 #endif
-	  _state = 0;
-	  n = 0;
-	  _terms = 0;
-	  _nt = 0;
-  }
-  // LF and CR always reset parser
-  if ((c == 0x0A) || (c == 0x0D))
-  {
+		_state = 0;
+		n = 0;
+		_terms = 0;
+		_nt = 0;
+	}
+	// LF and CR always reset parser
+	if ((c == 0x0A) || (c == 0x0D))
+	{
 #ifdef DEBUG
-    debugPort->println("LF or CR received. Resetting state.");
+		debugPort->println("LF or CR received. Resetting state.");
 #endif
-    _state = 0;
-  }
-  // $ Always starts a new sentence
-  if (c == '$')
-  {
+		_state = 0;
+	}
+	// $ Always starts a new sentence
+	if (c == '$')
+	{
 #ifdef DEBUG
-	 debugPort->println("New sentence.");
+	debugPort->println("New sentence.");
 #endif
-    _sentence[0] = c;
-    _state = 1;
-    _terms = 0;
-    n = 1;
-    _nt = 0;
-    return 0;
-  }
+		//_sentence[0] = c;
+		_state = 1;
+		_terms = 0;
+		n = 1;
+		_nt = 0;
+		checksum = 0;
+		return 0;
+	}
   
-  switch (_state)
-  {
-    case 0 :
-    {
-      // Waiting for $. Do nothing
+	switch (_state)
+	{
+		case 0 :
+		{
+			// Waiting for $. Do nothing
 #ifdef DEBUG
 			debugPort->println("Waiting for $.");
 #endif
-      break;
-    }
-    case 1 :
-    {
-      _sentence[n++] = c;
-      switch (c)
-      {
-        // Delimits the terms in sentence
-        case ',' :
-        {
+			break;
+		}
+		case 1 :
+		{
+			//_sentence[n++] = c;
+			n++;
+			switch (c)
+			{
+			// Delimits the terms in sentence
+				case ',' :
+				{
 #ifdef DEBUG
-          debugPort->print(",");
+					debugPort->print(",");
 #endif
-          (_term[_terms++])[_nt] = 0;
-          _nt = 0;
-          break;
-        }
-        // End of sentence
-        case '*' :
-        {
+					(_term[_terms++])[_nt] = 0;
+					_nt = 0;
+					checksum = checksum ^ c;
+					break;
+				}
+				// End of terms
+				case '*' :
+				{
 #ifdef DEBUG
-			debugPort->println("*");
+					debugPort->print("*");
 #endif
-          (_term[_terms++])[_nt] = 0;
-          _nt = 0;
-          _state++;
-          break;
-        }
-        default :
-        {
+					(_term[_terms++])[_nt] = 0;
+					_nt = 0;
+					_state++;
+					break;
+				}
+				// All characters between $ and *
+				default :
+				{
+#ifdef DEBUG
+					debugPort->print(c);
+#endif
+					(_term[_terms])[_nt++] = c;
+					checksum = checksum ^ c;
+					break;
+				}
+			}
+			break;
+		}
+		// Checksum MSB
+		case 2 :
+		{
 #ifdef DEBUG
 			debugPort->print(c);
 #endif
-          (_term[_terms])[_nt++] = c;
-          break;
-        }
-      }
-	  break;
-    }
-    // Sentence complete
-    case 2 :
-    {
+			checksum = checksum - (16 * _dehex(c));
+			_state++;
+			break;
+		}
+		// Sentence complete
+		case 3 :
+		{
 #ifdef DEBUG
-	  debugPort->println("Scentence complete. Coping term to f_term.");
+			debugPort->println(c);
 #endif
-      // Copy sentence to f_sentece
-      while ((--n) >= 0)
-      {
-        f_sentence[n] = _sentence[n];
-      }
-      for (f_terms=0; f_terms<_terms; f_terms++) {
-      _nt = 0;
-        while ((_term[f_terms])[_nt]) {
-          (f_term[f_terms])[_nt] = (_term[f_terms])[_nt];
-          _nt++;
-        }
-        (f_term[f_terms])[_nt] = 0;
-        
-      }
-	  _state = 0;
-      return 1;
-    }
-    default :
-    {
-      _state = 0;
-      break;
-    }
+			checksum = checksum - _dehex(c);
+#ifdef DEBUG
+			debugPort->print("Scentence complete. Coping term to f_term. Checksum is: ");
+			debugPort->println(checksum, HEX);
+#endif
+			if (checksum == 0)
+			{
+				for (f_terms=0; f_terms<_terms; f_terms++)
+				{
+					_nt = 0;
+					while ((_term[f_terms])[_nt])
+					{
+						(f_term[f_terms])[_nt] = (_term[f_terms])[_nt];
+						_nt++;
+					}
+					(f_term[f_terms])[_nt] = 0;        
+				}
+
+				_state = 0;
+				return 1;
+			}
+			break;
+		}
+		default :
+		{
+			_state = 0;
+			break;
+		}
   }
 
   return 0;
@@ -200,4 +221,15 @@ float parser::termToDecimal(int t)
 	}
 	
 	return rr;
+}
+
+int parser::_dehex(char a) {
+	// returns base-16 value of chars '0'-'9' and 'A'-'F';
+	// does not trap invalid chars!
+  if (int(a) >= 65) {
+    return int(a)-87;
+  }
+  else {
+    return int(a)-48;
+  }
 }

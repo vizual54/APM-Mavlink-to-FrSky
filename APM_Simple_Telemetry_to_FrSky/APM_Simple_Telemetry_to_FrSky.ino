@@ -7,7 +7,7 @@
 #define HEARTBEATLED 13
 #define HEARTBEATFREQ 500
 
-#define DEBUG
+//#define DEBUG
 #define DEBUGFRSKY
 
 parser *p;
@@ -48,10 +48,6 @@ void setup() {
         
 	digitalWrite(HEARTBEATLED, HIGH);
 	hbState = HIGH;
-
-#ifdef DEBUG
-	debugSerial->println("Setting up timer.");
-#endif
 
 	FlexiTimer2::set(200, 1.0/1000, sendFrSkyData); // call every 200 1ms "ticks"
 	FlexiTimer2::start();
