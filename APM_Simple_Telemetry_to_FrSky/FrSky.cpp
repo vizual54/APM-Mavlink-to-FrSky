@@ -100,7 +100,9 @@ unsigned char FrSky::addBufferData(const char id)
 	switch(id) {
 		case GPSALT :
 		{
-			float gpsAltitude = par->termToDecimal(6) * 1000.0f; //  Main battery voltage in V
+			//float gpsAltitude = par->termToDecimal(6) * 100.0f; // GPS Altitude i m
+			float gpsAltitude = 0.0f;
+
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSALT;
 			frskyBuffer[bufferLength + 2] = msByte((int)gpsAltitude);
@@ -119,29 +121,31 @@ unsigned char FrSky::addBufferData(const char id)
 		case TEMP1 :
 		{
 			// APM mode
-			float temp1 = par->termToDecimal(14); // 15 APM mode
+			int temp1 = (int)par->termToDecimal(13); // APM mode
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP1;
-			frskyBuffer[bufferLength + 2] = msByte(temp1);
-			frskyBuffer[bufferLength + 3] = lsByte(temp1);
+			frskyBuffer[bufferLength + 2] = lsByte(temp1);
+			frskyBuffer[bufferLength + 3] = msByte(temp1);
       
 			return 4;
 			break;
 		}
 		case RPM :
 		{
-			float engineSpeed = par->termToDecimal(16); // Throttle out
-
+			//float engineSpeed = par->termToDecimal(15); // Throttle out
+			float engineSpeed = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = RPM;
-			frskyBuffer[bufferLength + 2] = msByte(engineSpeed);
-			frskyBuffer[bufferLength + 3] = lsByte(engineSpeed);
+			frskyBuffer[bufferLength + 2] = lsByte(engineSpeed);
+			frskyBuffer[bufferLength + 3] = msByte(engineSpeed);
 			return 4;
 			break;
 		}
 		case FUEL :
 		{
-			float fuelLevel = par->termToDecimal(2); // Battery remaining in %
+			//float fuelLevel = par->termToDecimal(2); // Battery remaining in %
+			float fuelLevel = 0.0f;
+
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = FUEL;
 			if (fuelLevel <= 40)
@@ -170,12 +174,13 @@ unsigned char FrSky::addBufferData(const char id)
 		case TEMP2 :
 		{
 			// GPS status mode, number of satelites in view
-			float nrSats = par->termToDecimal(8);    // GPS Number of satelites in view 
-			float gpsStatus = par->termToDecimal(4); // GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
+			int nrSats = (int)par->termToDecimal(8);    // GPS Number of satelites in view 
+			int gpsStatus = (int)par->termToDecimal(3); // GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
+			int value = gpsStatus * 10 + nrSats;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP2;
-			frskyBuffer[bufferLength + 2] = (byte)gpsStatus;
-			frskyBuffer[bufferLength + 3] = (byte)nrSats;
+			frskyBuffer[bufferLength + 2] = lsByte(value);
+			frskyBuffer[bufferLength + 3] = msByte(value);
 			return 4;
 			break;
 		}
@@ -187,7 +192,8 @@ unsigned char FrSky::addBufferData(const char id)
 		case ALTITUDE :
 		{
 			// Altitude in cm minus Home altitude in cm
-			float altitude = (par->termToDecimal(12) - par->termToDecimal(14)) / 100.0f;
+			//float altitude = (par->termToDecimal(11) - par->termToDecimal(12)) / 100.0f;
+			float altitude = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ALTITUDE;
 			frskyBuffer[bufferLength + 2] = msByte((int)altitude);
@@ -204,7 +210,9 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case GPSSPEED :
 		{
-			float gpsSpeed = par->termToDecimal(9) * 0.0194384f; // GPS Ground speed in knots
+			//float gpsSpeed = par->termToDecimal(9) * 0.0194384f; // GPS Ground speed in knots
+			float gpsSpeed = 0.0f;
+
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSSPEED;
 			frskyBuffer[bufferLength + 2] = msByte((int)gpsSpeed);
@@ -272,8 +280,8 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case COURSE :
 		{
-			float course = (par->termToDecimal(10) / 100.0f); // Course in 1/100 degree
-
+			//float course = (par->termToDecimal(14) / 100.0f); // Course in 1/100 degree
+			float course = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = COURSE;
 			frskyBuffer[bufferLength + 2] = msByte((int)course);
@@ -289,99 +297,101 @@ unsigned char FrSky::addBufferData(const char id)
 			return 8;
 			break;
 		}
-	case DATE :
-	{
-		float date = 0.0f;
-		frskyBuffer[bufferLength] = header_value;
-		frskyBuffer[bufferLength + 1] = DATE;
-		frskyBuffer[bufferLength + 2] = msByte((int)date);
-		frskyBuffer[bufferLength + 3] = lsByte((int)date);
-		return 4;
-		break;
-	}
-	case YEAR :
-	{
-		return 0;
-		break;
-	}
-	case TIME :
-	{
-		float time = 0.0f;
-		frskyBuffer[bufferLength] = header_value;
-		frskyBuffer[bufferLength + 1] = TIME;
-		frskyBuffer[bufferLength + 2] = msByte((int)time);
-		frskyBuffer[bufferLength + 3] = lsByte((int)time);
-		return 4;
-		break;
-	}
-	case SECOND :
-	{
-		return 0;
-		break;
-	}
-	case ACCX :
-	{
-		//float accX = par->termToDecimal(17) / 100.0f;
-		float accX = 0.0f;
-		frskyBuffer[bufferLength] = header_value;
-		frskyBuffer[bufferLength + 1] = ACCX;
-		frskyBuffer[bufferLength + 2] = msByte((int)(accX*100.0f));
-		frskyBuffer[bufferLength + 3] = lsByte((int)(accX*100.0f));
-		return 4;
-		break;
-	}
-	case ACCY :
-	{
-		//float accY = par->termToDecimal(18) / 100.0f;
-		float accY = 0.0f;
-		frskyBuffer[bufferLength] = header_value;
-		frskyBuffer[bufferLength + 1] = ACCY;
-		frskyBuffer[bufferLength + 2] = msByte((int)(accY*100.0f));
-		frskyBuffer[bufferLength + 3] = lsByte((int)(accY*100.0f));
-		return 4;
-		break;
-	}
-	case ACCZ :
-	{
-		//float accZ = par->termToDecimal(19) / 100.0f;
-		float accZ = 0.0f;
-		frskyBuffer[bufferLength] = header_value;
-		frskyBuffer[bufferLength + 1] = ACCZ;
-		frskyBuffer[bufferLength + 2] = msByte((int)(accZ*100.0f));
-		frskyBuffer[bufferLength + 3] = lsByte((int)(accZ*100.0f));
-		return 4;
-		break;
-	}
-	case CURRENT :
-	{
-		float current = par->termToDecimal(1);
-		frskyBuffer[bufferLength] = header_value;
-		frskyBuffer[bufferLength + 1] = CURRENT;
-		frskyBuffer[bufferLength + 2] = msByte((int)(current*100.0f));
-		frskyBuffer[bufferLength + 3] = lsByte((int)(current*100.0f));
-		return 4;
-		break;
-	}
-	case VOLTAGE :
-	{
-		float batteryVoltage = par->termToDecimal(0);
-		frskyBuffer[bufferLength] = header_value;
-		frskyBuffer[bufferLength + 1] = VOLTAGE;
-		frskyBuffer[bufferLength + 2] = msByte((int)batteryVoltage);
-		frskyBuffer[bufferLength + 3] = lsByte((int)batteryVoltage);
+		case DATE :
+		{
+			float date = 0.0f;
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = DATE;
+			frskyBuffer[bufferLength + 2] = msByte((int)date);
+			frskyBuffer[bufferLength + 3] = lsByte((int)date);
+			return 4;
+			break;
+		}
+		case YEAR :
+		{
+			return 0;
+			break;
+		}
+		case TIME :
+		{
+			float time = 0.0f;
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = TIME;
+			frskyBuffer[bufferLength + 2] = msByte((int)time);
+			frskyBuffer[bufferLength + 3] = lsByte((int)time);
+			return 4;
+			break;
+		}
+		case SECOND :
+		{
+			return 0;
+			break;
+		}
+		case ACCX :
+		{
+			//float accX = par->termToDecimal(17) / 100.0f;
+			float accX = 0.0f;
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = ACCX;
+			frskyBuffer[bufferLength + 2] = msByte((int)(accX*100.0f));
+			frskyBuffer[bufferLength + 3] = lsByte((int)(accX*100.0f));
+			return 4;
+			break;
+		}
+		case ACCY :
+		{
+			//float accY = par->termToDecimal(18) / 100.0f;
+			float accY = 0.0f;
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = ACCY;
+			frskyBuffer[bufferLength + 2] = msByte((int)(accY*100.0f));
+			frskyBuffer[bufferLength + 3] = lsByte((int)(accY*100.0f));
+			return 4;
+			break;
+		}
+		case ACCZ :
+		{
+			//float accZ = par->termToDecimal(19) / 100.0f;
+			float accZ = 0.0f;
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = ACCZ;
+			frskyBuffer[bufferLength + 2] = msByte((int)(accZ*100.0f));
+			frskyBuffer[bufferLength + 3] = lsByte((int)(accZ*100.0f));
+			return 4;
+			break;
+		}
+		case CURRENT :
+		{
+			//float current = par->termToDecimal(1);
+			float current = 0.0f;
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = CURRENT;
+			frskyBuffer[bufferLength + 2] = msByte((int)(current*100.0f));
+			frskyBuffer[bufferLength + 3] = lsByte((int)(current*100.0f));
+			return 4;
+			break;
+		}
+		case VOLTAGE :
+		{
+			//float batteryVoltage = par->termToDecimal(0);
+			float batteryVoltage = 0.0f;
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = VOLTAGE;
+			frskyBuffer[bufferLength + 2] = msByte((int)batteryVoltage);
+			frskyBuffer[bufferLength + 3] = lsByte((int)batteryVoltage);
       
-		unsigned int temp = (unsigned int)((batteryVoltage - (int)batteryVoltage) * 1000.0f);
+			unsigned int temp = (unsigned int)((batteryVoltage - (int)batteryVoltage) * 1000.0f);
     
-		frskyBuffer[bufferLength + 4] = header_value;
-		frskyBuffer[bufferLength + 5] = VOLTAGEDEC;
-		frskyBuffer[bufferLength + 6] = msByte(temp);
-		frskyBuffer[bufferLength + 7] = lsByte(temp);
+			frskyBuffer[bufferLength + 4] = header_value;
+			frskyBuffer[bufferLength + 5] = VOLTAGEDEC;
+			frskyBuffer[bufferLength + 6] = msByte(temp);
+			frskyBuffer[bufferLength + 7] = lsByte(temp);
 
-		return 8;
-		break;
-	}
-	default :
-		return 0;
+			return 8;
+			break;
+		}
+		default :
+			return 0;
   }
   return 0;
 }

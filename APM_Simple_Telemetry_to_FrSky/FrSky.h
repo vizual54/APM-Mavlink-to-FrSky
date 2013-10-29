@@ -23,12 +23,12 @@
 // 10 GPS Course in 1/100 degree                 
 // 11 Altitude in cm         
 // 12 Home altitude in cm    
-// 14 APM mode                               
-// 15 Compass                                
-// 16 Throttle out           
-// 17 Accel-X
-// 18 Accel-Y
-// 19 Accel-Z
+// 13 APM mode                               
+// 14 Compass                                
+// 15 Throttle out           
+// 16 Accel-X
+// 17 Accel-Y
+// 18 Accel-Z
 // * - end
 
 class FrSky
