@@ -105,15 +105,15 @@ unsigned char FrSky::addBufferData(const char id)
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSALT;
-			frskyBuffer[bufferLength + 2] = msByte((int)gpsAltitude);
-			frskyBuffer[bufferLength + 3] = lsByte((int)gpsAltitude);
+			frskyBuffer[bufferLength + 2] = lsByte((int)gpsAltitude);
+			frskyBuffer[bufferLength + 3] = msByte((int)gpsAltitude);
       
 			unsigned int temp = (unsigned int)((gpsAltitude - (int)gpsAltitude) * 1000.0f);
 
 			frskyBuffer[bufferLength + 4] = header_value;
 			frskyBuffer[bufferLength + 5] = GPSALT + decimal;
-			frskyBuffer[bufferLength + 6] = msByte(temp);
-			frskyBuffer[bufferLength + 7] = lsByte(temp);
+			frskyBuffer[bufferLength + 6] = lsByte(temp);
+			frskyBuffer[bufferLength + 7] = msByte(temp);
       
 			return 8;
 			break;
@@ -121,7 +121,7 @@ unsigned char FrSky::addBufferData(const char id)
 		case TEMP1 :
 		{
 			// APM mode
-			int temp1 = (int)par->termToDecimal(13); // APM mode
+			int temp1 = (int)par->termToDecimal(13);
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP1;
 			frskyBuffer[bufferLength + 2] = lsByte(temp1);
@@ -132,8 +132,8 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case RPM :
 		{
-			//float engineSpeed = par->termToDecimal(15); // Throttle out
-			float engineSpeed = 0.0f;
+			// Throttle out
+			int engineSpeed = (int)par->termToDecimal(15);
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = RPM;
 			frskyBuffer[bufferLength + 2] = lsByte(engineSpeed);
@@ -143,30 +143,30 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case FUEL :
 		{
-			//float fuelLevel = par->termToDecimal(2); // Battery remaining in %
-			float fuelLevel = 0.0f;
+			// Battery remaining in %
+			int fuelLevel = (int)par->termToDecimal(2); 
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = FUEL;
 			if (fuelLevel <= 40)
 			{
-				frskyBuffer[bufferLength + 2] = msByte(25);
-				frskyBuffer[bufferLength + 3] = lsByte(25);      
+				frskyBuffer[bufferLength + 2] = lsByte(25);
+				frskyBuffer[bufferLength + 3] = msByte(25);      
 			}
 			else if (fuelLevel > 40 && fuelLevel <= 60)
 			{
-				frskyBuffer[bufferLength + 2] = msByte(50);
-				frskyBuffer[bufferLength + 3] = lsByte(50);
+				frskyBuffer[bufferLength + 2] = lsByte(50);
+				frskyBuffer[bufferLength + 3] = msByte(50);
 			}
 			else if (fuelLevel > 60 && fuelLevel <= 80)
 			{
-				frskyBuffer[bufferLength + 2] = msByte(75);
-				frskyBuffer[bufferLength + 3] = lsByte(75);
+				frskyBuffer[bufferLength + 2] = lsByte(75);
+				frskyBuffer[bufferLength + 3] = msByte(75);
 			}
 			else
 			{
-				frskyBuffer[bufferLength + 2] = msByte(100);
-				frskyBuffer[bufferLength + 3] = lsByte(100);
+				frskyBuffer[bufferLength + 2] = lsByte(100);
+				frskyBuffer[bufferLength + 3] = msByte(100);
 			}
 			return 4;
 			break;
@@ -196,15 +196,15 @@ unsigned char FrSky::addBufferData(const char id)
 			float altitude = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ALTITUDE;
-			frskyBuffer[bufferLength + 2] = msByte((int)altitude);
-			frskyBuffer[bufferLength + 3] = lsByte((int)altitude);
+			frskyBuffer[bufferLength + 2] = lsByte((int)altitude);
+			frskyBuffer[bufferLength + 3] = msByte((int)altitude);
       
 			unsigned int temp = (unsigned int)((altitude - (int)altitude) * 1000.0f);
     
 			frskyBuffer[bufferLength + 4] = header_value;
 			frskyBuffer[bufferLength + 5] = ALTIDEC;
-			frskyBuffer[bufferLength + 6] = msByte(temp);
-			frskyBuffer[bufferLength + 7] = lsByte(temp);
+			frskyBuffer[bufferLength + 6] = lsByte(temp);
+			frskyBuffer[bufferLength + 7] = msByte(temp);
 			return 8;
 			break;
 		}
@@ -215,15 +215,15 @@ unsigned char FrSky::addBufferData(const char id)
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSSPEED;
-			frskyBuffer[bufferLength + 2] = msByte((int)gpsSpeed);
-			frskyBuffer[bufferLength + 3] = lsByte((int)gpsSpeed);
+			frskyBuffer[bufferLength + 2] = lsByte((int)gpsSpeed);
+			frskyBuffer[bufferLength + 3] = msByte((int)gpsSpeed);
       
 			unsigned int temp = (unsigned int)((gpsSpeed - (int)gpsSpeed) * 1000.0f);
     
 			frskyBuffer[bufferLength + 4] = header_value;
 			frskyBuffer[bufferLength + 5] = GPSSPEED + decimal;
-			frskyBuffer[bufferLength + 6] = msByte(temp);
-			frskyBuffer[bufferLength + 7] = lsByte(temp);
+			frskyBuffer[bufferLength + 6] = lsByte(temp);
+			frskyBuffer[bufferLength + 7] = msByte(temp);
       
 			return 8;
 			break;
@@ -234,15 +234,15 @@ unsigned char FrSky::addBufferData(const char id)
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = LATITUDE;
-			frskyBuffer[bufferLength + 2] = msByte((int)gpsLatitude);
-			frskyBuffer[bufferLength + 3] = lsByte((int)gpsLatitude);
+			frskyBuffer[bufferLength + 2] = lsByte((int)gpsLatitude);
+			frskyBuffer[bufferLength + 3] = msByte((int)gpsLatitude);
       
 			unsigned int temp = (unsigned int)((gpsLatitude - (int)gpsLatitude) * 1000.0f);
     
 			frskyBuffer[bufferLength + 4] = header_value;
 			frskyBuffer[bufferLength + 5] = LATITUDE + decimal;
-			frskyBuffer[bufferLength + 6] = msByte(temp);
-			frskyBuffer[bufferLength + 7] = lsByte(temp);
+			frskyBuffer[bufferLength + 6] = lsByte(temp);
+			frskyBuffer[bufferLength + 7] = msByte(temp);
       
 			char northSouth = (gpsLatitude < 0) ? 'S' : 'N';
 			frskyBuffer[bufferLength + 8] = header_value;
@@ -259,15 +259,15 @@ unsigned char FrSky::addBufferData(const char id)
 
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = LONGITUDE;
-			frskyBuffer[bufferLength + 2] = msByte((int)gpsLongitude);
-			frskyBuffer[bufferLength + 3] = lsByte((int)gpsLongitude);
+			frskyBuffer[bufferLength + 2] = lsByte((int)gpsLongitude);
+			frskyBuffer[bufferLength + 3] = msByte((int)gpsLongitude);
       
 			unsigned int temp = (unsigned int)((gpsLongitude - (int)gpsLongitude) * 1000.0f);
     
 			frskyBuffer[bufferLength + 4] = header_value;
 			frskyBuffer[bufferLength + 5] = LONGITUDE + decimal;
-			frskyBuffer[bufferLength + 6] = msByte(temp);
-			frskyBuffer[bufferLength + 7] = lsByte(temp);
+			frskyBuffer[bufferLength + 6] = lsByte(temp);
+			frskyBuffer[bufferLength + 7] = msByte(temp);
 			
 			char eastWest = (gpsLongitude < 0 ) ? 'W' : 'E';
 			frskyBuffer[bufferLength + 8] = header_value;
@@ -284,15 +284,15 @@ unsigned char FrSky::addBufferData(const char id)
 			float course = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = COURSE;
-			frskyBuffer[bufferLength + 2] = msByte((int)course);
-			frskyBuffer[bufferLength + 3] = lsByte((int)course);
+			frskyBuffer[bufferLength + 2] = lsByte((int)course);
+			frskyBuffer[bufferLength + 3] = msByte((int)course);
       
 			unsigned int temp = (unsigned int)((course - (int)course) * 1000.0f);
     
 			frskyBuffer[bufferLength + 4] = header_value;
 			frskyBuffer[bufferLength + 5] = COURSE + decimal;
-			frskyBuffer[bufferLength + 6] = msByte(temp);
-			frskyBuffer[bufferLength + 7] = lsByte(temp);
+			frskyBuffer[bufferLength + 6] = lsByte(temp);
+			frskyBuffer[bufferLength + 7] = msByte(temp);
       
 			return 8;
 			break;
@@ -302,8 +302,8 @@ unsigned char FrSky::addBufferData(const char id)
 			float date = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = DATE;
-			frskyBuffer[bufferLength + 2] = msByte((int)date);
-			frskyBuffer[bufferLength + 3] = lsByte((int)date);
+			frskyBuffer[bufferLength + 2] = lsByte((int)date);
+			frskyBuffer[bufferLength + 3] = msByte((int)date);
 			return 4;
 			break;
 		}
@@ -317,8 +317,8 @@ unsigned char FrSky::addBufferData(const char id)
 			float time = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TIME;
-			frskyBuffer[bufferLength + 2] = msByte((int)time);
-			frskyBuffer[bufferLength + 3] = lsByte((int)time);
+			frskyBuffer[bufferLength + 2] = lsByte((int)time);
+			frskyBuffer[bufferLength + 3] = msByte((int)time);
 			return 4;
 			break;
 		}
@@ -333,8 +333,8 @@ unsigned char FrSky::addBufferData(const char id)
 			float accX = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ACCX;
-			frskyBuffer[bufferLength + 2] = msByte((int)(accX*100.0f));
-			frskyBuffer[bufferLength + 3] = lsByte((int)(accX*100.0f));
+			frskyBuffer[bufferLength + 2] = lsByte((int)(accX*100.0f));
+			frskyBuffer[bufferLength + 3] = msByte((int)(accX*100.0f));
 			return 4;
 			break;
 		}
@@ -344,8 +344,8 @@ unsigned char FrSky::addBufferData(const char id)
 			float accY = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ACCY;
-			frskyBuffer[bufferLength + 2] = msByte((int)(accY*100.0f));
-			frskyBuffer[bufferLength + 3] = lsByte((int)(accY*100.0f));
+			frskyBuffer[bufferLength + 2] = lsByte((int)(accY*100.0f));
+			frskyBuffer[bufferLength + 3] = msByte((int)(accY*100.0f));
 			return 4;
 			break;
 		}
@@ -355,8 +355,8 @@ unsigned char FrSky::addBufferData(const char id)
 			float accZ = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ACCZ;
-			frskyBuffer[bufferLength + 2] = msByte((int)(accZ*100.0f));
-			frskyBuffer[bufferLength + 3] = lsByte((int)(accZ*100.0f));
+			frskyBuffer[bufferLength + 2] = lsByte((int)(accZ*100.0f));
+			frskyBuffer[bufferLength + 3] = msByte((int)(accZ*100.0f));
 			return 4;
 			break;
 		}
@@ -366,8 +366,8 @@ unsigned char FrSky::addBufferData(const char id)
 			float current = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = CURRENT;
-			frskyBuffer[bufferLength + 2] = msByte((int)(current*100.0f));
-			frskyBuffer[bufferLength + 3] = lsByte((int)(current*100.0f));
+			frskyBuffer[bufferLength + 2] = lsByte((int)(current*100.0f));
+			frskyBuffer[bufferLength + 3] = msByte((int)(current*100.0f));
 			return 4;
 			break;
 		}
@@ -377,15 +377,15 @@ unsigned char FrSky::addBufferData(const char id)
 			float batteryVoltage = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = VOLTAGE;
-			frskyBuffer[bufferLength + 2] = msByte((int)batteryVoltage);
-			frskyBuffer[bufferLength + 3] = lsByte((int)batteryVoltage);
+			frskyBuffer[bufferLength + 2] = lsByte((int)batteryVoltage);
+			frskyBuffer[bufferLength + 3] = msByte((int)batteryVoltage);
       
 			unsigned int temp = (unsigned int)((batteryVoltage - (int)batteryVoltage) * 1000.0f);
     
 			frskyBuffer[bufferLength + 4] = header_value;
 			frskyBuffer[bufferLength + 5] = VOLTAGEDEC;
-			frskyBuffer[bufferLength + 6] = msByte(temp);
-			frskyBuffer[bufferLength + 7] = lsByte(temp);
+			frskyBuffer[bufferLength + 6] = lsByte(temp);
+			frskyBuffer[bufferLength + 7] = msByte(temp);
 
 			return 8;
 			break;
