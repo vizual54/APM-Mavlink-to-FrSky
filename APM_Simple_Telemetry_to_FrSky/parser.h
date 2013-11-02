@@ -12,6 +12,7 @@
 class parser
 {
 public:
+	parser();
 	parser(SoftwareSerial* port);
 	~parser(void);
 	bool parse(char c);

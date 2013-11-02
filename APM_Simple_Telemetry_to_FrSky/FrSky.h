@@ -35,6 +35,7 @@ class FrSky
 {
 	
 public:
+		FrSky(SoftwareSerial* serialPort, SoftwareSerial* debugSerialPort, parser* p);
 		FrSky(SoftwareSerial* serialPort, parser* p);
 		~FrSky(void);
 		void saveValues();
@@ -47,10 +48,11 @@ public:
 		
 private:
 		SoftwareSerial	*frSkySerial;
+		SoftwareSerial	*debugPort;
 		parser			*par;
-		unsigned char	frskyBuffer[48];
+		unsigned char	frskyBuffer[64];
 		int				bufferLength;
-		
+		long FixInt(long val, byte mp);
 		float gpsDdToDmsFormat(float ddm);
 		byte lsByte(int value);
 		byte msByte(int value);

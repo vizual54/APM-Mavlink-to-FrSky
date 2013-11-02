@@ -1,5 +1,25 @@
 #include "parser.h"
 
+parser::parser()
+{
+	f_terms = 0;
+	_state = 0;
+	n = 0;
+	_terms = 0;
+	_nt = 0;
+
+        // allocate memory for individual terms of sentence in parser
+	for (int t=0; t<MAXTERMS; t++) {
+		_term[t] = (char*) malloc (MAXWORD * sizeof(char));
+		f_term[t] = (char*) malloc (MAXWORD * sizeof(char));
+		//(f_term[t])[0] = 0;
+		for (int c = 0; c < MAXWORD; c++)
+		{
+			(f_term[t])[c] = 0;
+		}
+	}
+}
+
 parser::parser(SoftwareSerial* port)
 {
 	debugPort = port;
@@ -13,7 +33,11 @@ parser::parser(SoftwareSerial* port)
 	for (int t=0; t<MAXTERMS; t++) {
 		_term[t] = (char*) malloc (MAXWORD * sizeof(char));
 		f_term[t] = (char*) malloc (MAXWORD * sizeof(char));
-		(f_term[t])[0] = 0;
+		//(f_term[t])[0] = 0;
+		for (int c = 0; c < MAXWORD; c++)
+		{
+			(f_term[t])[c] = 0;
+		}
 	}
 #ifdef DEBUG
 	debugPort->println("parser initialized.");
@@ -137,11 +161,12 @@ bool parser::parse(char c)
 #endif
 			checksum = checksum - _dehex(c);
 #ifdef DEBUG
-			debugPort->print("Scentence complete. Coping term to f_term. Checksum is: ");
+			debugPort->print("Scentence complete. Checksum is: ");
 			debugPort->println(checksum, HEX);
 #endif
 			if (checksum == 0)
 			{
+				debugPort->println("Checksum ok. Copying terms to f_terms.");
 				for (f_terms=0; f_terms<_terms; f_terms++)
 				{
 					_nt = 0;

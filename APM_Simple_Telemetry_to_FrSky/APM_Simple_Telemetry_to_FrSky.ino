@@ -12,8 +12,14 @@
 
 parser *p;
 FrSky *frSky;
-SoftwareSerial *debugSerial;
 SoftwareSerial *frSkySerial;
+#ifdef DEBUG
+SoftwareSerial *debugSerial;
+#endif
+#ifdef DEBUGFRSKY
+SoftwareSerial *frskyDebugSerial;
+#endif
+
 SimpleFIFO<char, 128> queue;
 
 int		counter = 0;
@@ -22,15 +28,18 @@ byte	hbState;
 bool	firstParse = false;
 
 void setup() {
+#ifdef DEBUG
 	// Debug serial port pin 11 rx, 12 tx
 	debugSerial = new SoftwareSerial(12, 11);
 	debugSerial->begin(38400);
-	// FrSky data port pin 6 rx, 5 tx
-#ifdef DEBUGFRSKY
-	frSkySerial = new SoftwareSerial(6, 5);
-#else
-	frSkySerial = new SoftwareSerial(6, 5, true);
 #endif
+	
+#ifdef DEBUGFRSKY
+	frskyDebugSerial = new SoftwareSerial(12, 11);
+	frskyDebugSerial->begin(38400);
+#endif
+	// FrSky data port pin 6 rx, 5 tx
+	frSkySerial = new SoftwareSerial(6, 5, true);
 	frSkySerial->begin(9600);
 	// Incoming data from APM
 	Serial.begin(57600);
@@ -42,10 +51,19 @@ void setup() {
 	debugSerial->print(freeRam());
 	debugSerial->println(" bytes");
 #endif
-	
+
+#ifndef DEBUG
+	p = new parser();
+#else
 	p = new parser(debugSerial);
+#endif
+
+#ifndef DEBUGFRSKY
 	frSky = new FrSky(frSkySerial, p);
-        
+#else
+	frSky = new FrSky(frSkySerial, frskyDebugSerial, p);
+#endif    
+
 	digitalWrite(HEARTBEATLED, HIGH);
 	hbState = HIGH;
 
@@ -57,7 +75,7 @@ void setup() {
 #endif
 
 	// Blink fast a couple of times to wait for the APM to boot
-	for (int i = 0; i < 200; i++)
+	for (int i = 0; i < 100; i++)
 	{
 		if (i % 2)
 		{
@@ -78,6 +96,10 @@ void setup() {
 	debugSerial->print(freeRam());
 	debugSerial->println(" bytes");
 #endif
+
+#ifdef DEBUGFRSKY
+	frskyDebugSerial->println("Initialization done.");
+#endif
 }
 
 void loop() {
@@ -90,7 +112,9 @@ void loop() {
 		}
 		else
 		{
+#ifdef DEBUG
 			debugSerial->println("QUEUE IS FULL!");
+#endif
 		}
 	}
 	
@@ -118,23 +142,20 @@ void updateHeartbeat()
 void sendFrSkyData()
 {
 	counter++;
-	if (firstParse)
+	
+	if (counter == 25)			// Send 5000 ms frame
 	{
-		if (counter == 25)			// Send 5000 ms frame
-		{
-			frSky->sendFrSky05Hz();
-			counter = 0;
-		}
-		else if (counter == 5)		// Send 1000 ms frame
-		{
-			frSky->sendFrSky1Hz();
-		}
-		else						// Send 200 ms frame
-		{
-			frSky->sendFrSky5Hz();
-		}
-		
+		frSky->sendFrSky05Hz();
+		counter = 0;
 	}
+	else if (counter == 5)		// Send 1000 ms frame
+	{
+		frSky->sendFrSky1Hz();
+	}
+	else						// Send 200 ms frame
+	{
+		frSky->sendFrSky5Hz();
+	}	
 }
 
 void processData()
