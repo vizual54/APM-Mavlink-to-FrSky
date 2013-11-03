@@ -24,7 +24,7 @@
 #define HEARTBEATLED 13
 #define HEARTBEATFREQ 500
 
-//#define DEBUG
+#define DEBUG
 //#define DEBUGFRSKY
 
 parser *p;

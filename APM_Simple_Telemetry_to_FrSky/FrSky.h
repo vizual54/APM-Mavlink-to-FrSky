@@ -56,21 +56,18 @@ public:
 		FrSky(SoftwareSerial* serialPort, SoftwareSerial* debugSerialPort, parser* p);
 		FrSky(SoftwareSerial* serialPort, parser* p);
 		~FrSky(void);
-		void saveValues();
 		void sendFrSky5Hz();
 		void sendFrSky1Hz();
 		void sendFrSky05Hz();
-		unsigned char addBufferData(const char id);
-		unsigned char writeBuffer(const int length);
 		void printValues(SoftwareSerial* debugPort);
-		
 private:
 		SoftwareSerial	*frSkySerial;
 		SoftwareSerial	*debugPort;
 		parser			*par;
 		unsigned char	frskyBuffer[64];
 		int				bufferLength;
-		long FixInt(long val, byte mp);
+		unsigned char addBufferData(const char id);
+		unsigned char writeBuffer(const int length);
 		float gpsDdToDmsFormat(float ddm);
 		byte lsByte(int value);
 		byte msByte(int value);

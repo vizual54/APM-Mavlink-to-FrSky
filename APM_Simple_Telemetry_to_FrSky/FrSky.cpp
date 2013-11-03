@@ -41,20 +41,6 @@ FrSky::~FrSky(void)
 {
 }
 
-void FrSky::saveValues()
-{
-	// Save the values.
-      
-      //gpsAltitude = par->termToDecimal(7);
-      //fuelLevel = (int)par->termToDecimal(3);
-      //altitude = par->termToDecimal(14);
-      //gpsSpeed = par->termToDecimal(10);
-      //gpsLongitude = par->termToDecimal(13);
-      //gpsLatitude = par->termToDecimal(12);
-      //current = par->termToDecimal(2);
-      //batteryVoltage = par->termToDecimal(1);
-}
-
 // We receive the GPS coordinates in ddd.dddd format
 // FrSky wants the dd mm.mmm format so convert.
 float FrSky::gpsDdToDmsFormat(float ddm)
@@ -85,6 +71,7 @@ void FrSky::sendFrSky05Hz()
 // Send 1000 ms frame
 void FrSky::sendFrSky1Hz()
 {
+	
 	// Course, Latitude, Longitude, Speed, Altitude (GPS), Fuel Level
 	bufferLength += addBufferData(COURSE);
 	bufferLength += addBufferData(LATITUDE);
@@ -94,12 +81,13 @@ void FrSky::sendFrSky1Hz()
 	bufferLength += addBufferData(FUEL);
 	frskyBuffer[bufferLength++] = tail_value;
 	bufferLength = writeBuffer(bufferLength);
+	
 }
 
 // Send 200 ms frame
 void FrSky::sendFrSky5Hz()
 {
-	/*
+	
 	// Three-axis Acceleration Values, Altitude (variometer-0.01m), Tempature1, Temprature2, Voltage , Current & Voltage (Ampere Sensor) , RPM
 	bufferLength += addBufferData(ACCX);
 	bufferLength += addBufferData(ACCY);
@@ -113,7 +101,7 @@ void FrSky::sendFrSky5Hz()
 	bufferLength += addBufferData(RPM);
 	frskyBuffer[bufferLength++] = tail_value;
 	bufferLength = writeBuffer(bufferLength);
-	*/
+	
 }
 
 byte FrSky::lsByte(int value)
@@ -245,10 +233,8 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case LATITUDE :
 		{
-			float gpsLatitude = gpsDdToDmsFormat(par->termToDecimal(4) / 100000.0f);
-			//float gpsLatitude = gpsDdToDmsFormat(583968228.0f / 10000000.0f);
-			//debugPort->println("Lat: ");
-			//debugPort->println(gpsLatitude, 4);
+			float gpsLatitude = gpsDdToDmsFormat(par->termToDecimal(4) / 10000000.0f);
+
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = LATITUDE;
 			frskyBuffer[bufferLength + 2] = lsByte((int)gpsLatitude);
@@ -272,10 +258,8 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case LONGITUDE :
 		{
-			float gpsLongitude = gpsDdToDmsFormat(par->termToDecimal(5) / 100000.0f);
-			//float gpsLongitude = gpsDdToDmsFormat(156994206.0f / 10000000.0f);
-			//debugPort->println("Lon: ");
-			//debugPort->println(gpsLongitude, 4);
+			float gpsLongitude = gpsDdToDmsFormat(par->termToDecimal(5) / 10000000.0f);
+
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = LONGITUDE;
 			frskyBuffer[bufferLength + 2] = lsByte((int)gpsLongitude);
@@ -382,7 +366,7 @@ unsigned char FrSky::addBufferData(const char id)
 		}
 		case CURRENT :
 		{
-			float current = par->termToDecimal(1); // 10.0f -> 1A
+			float current = par->termToDecimal(1) / 1000.0f; // 10.0f -> 1A
 			
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = CURRENT;
@@ -415,19 +399,6 @@ unsigned char FrSky::addBufferData(const char id)
 			return 0;
   }
   return 0;
-}
-
-// FrSky int handling Little Endian, Big Endian
-long FixInt(long val, byte mp) {  
-	if(mp == 2)
-	{
-		return long(val / 256);
-	}
-	if (val >= 256 && mp == 1) 
-	{
-		return val % 256;
-	}
-	return 0;
 }
 
 unsigned char FrSky::writeBuffer(const int length)
