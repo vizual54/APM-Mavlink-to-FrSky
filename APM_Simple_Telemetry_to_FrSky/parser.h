@@ -16,6 +16,29 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// The following data is sent from APM
+//   $ - Header
+// 0  Main battery voltage in V              
+// 1  Battery current in mA                  
+// 2  Battery remaining in %                 
+// 3  GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
+// 4  GPS Latitude in decimal degrees        
+// 5  GPS Longitude in decimal degrees       
+// 6  GPS Altitude in cm                     
+// 7  GPS hdop                               
+// 8  GPS Number of satelites in view        
+// 9  GPS Ground speed in cm/s               
+// 10 GPS Course in 1/100 degree                 
+// 11 Altitude in cm         
+// 12 Home altitude in cm    
+// 13 APM mode                               
+// 14 Compass                                
+// 15 Throttle out           
+// 16 Accel-X
+// 17 Accel-Y
+// 18 Accel-Z
+// * - end
+
 #ifndef parser_h
 #define parser_h
 
@@ -23,22 +46,45 @@
 #define MAXSENTENCE 110
 #define MAXWORD 10
 
+#include "ifrskydataprovider.h"
 #include <SoftwareSerial.h>
 #include <Arduino.h>
 #include "defines.h"
 
-class parser
+class parser :	public IFrSkyDataProvider
 {
 public:
-	parser();
+	parser(void);
 	parser(SoftwareSerial* port);
 	~parser(void);
-	bool parse(char c);
-	int terms();
-	char* term(int i);
-	float termToDecimal(int t);
+	bool	parse(char c);
+	float	getMainBatteryVoltage(); 
+	float	getBatteryCurrent();
+	int		getBatteryRemaining();
+	int		getGpsStatus();
+	float	getLatitude();
+	float	getLongitud();
+	float	getGpsAltitude();
+	float	getGpsHdop();
+	int		getNumberOfSatelitesInView();
+	float	getGpsGroundSpeed();
+	float	getGpsCourse();
+	float	getAltitude();
+	float	getHomeAltitude();
+	int		getApmMode();
+	float	getCourse();
+	int		getThrottle();	
+	float	getAccX();
+	float	getAccY();
+	float	getAccZ();
+	int		getTime();
+	int     getDate();
+	int		terms();
+	char*	term(int i);
+	float	termToDecimal(int t);
 private:
 	int _dehex(char a);
+	float gpsDdToDmsFormat(float ddm);
 	SoftwareSerial* debugPort; 
 	char*	f_term[MAXTERMS];
 	int	f_terms;

@@ -18,16 +18,18 @@
 #include <SoftwareSerial.h>
 #include <FlexiTimer2.h>
 #include "parser.h"
+#include "Mavlink.h"
+#include "ifrskydataprovider.h"
 #include "FrSky.h"
 #include "SimpleFIFO.h"
 
 #define HEARTBEATLED 13
 #define HEARTBEATFREQ 500
 
-#define DEBUG
-//#define DEBUGFRSKY
+//#define DEBUG
+#define DEBUGFRSKY
 
-parser *p;
+parser *dataProvider;
 FrSky *frSky;
 SoftwareSerial *frSkySerial;
 #ifdef DEBUG
@@ -50,11 +52,11 @@ void setup() {
 	debugSerial = new SoftwareSerial(12, 11);
 	debugSerial->begin(38400);
 #endif
-	
 #ifdef DEBUGFRSKY
 	frskyDebugSerial = new SoftwareSerial(12, 11);
 	frskyDebugSerial->begin(38400);
 #endif
+	
 	// FrSky data port pin 6 rx, 5 tx
 	frSkySerial = new SoftwareSerial(6, 5, true);
 	frSkySerial->begin(9600);
@@ -70,16 +72,11 @@ void setup() {
 #endif
 
 #ifndef DEBUG
-	p = new parser();
+	dataProvider = new parser();
 #else
-	p = new parser(debugSerial);
+	dataProvider = new parser(debugSerial);
 #endif
-
-#ifndef DEBUGFRSKY
-	frSky = new FrSky(frSkySerial, p);
-#else
-	frSky = new FrSky(frSkySerial, frskyDebugSerial, p);
-#endif    
+	frSky = new FrSky();
 
 	digitalWrite(HEARTBEATLED, HIGH);
 	hbState = HIGH;
@@ -114,9 +111,6 @@ void setup() {
 	debugSerial->println(" bytes");
 #endif
 
-#ifdef DEBUGFRSKY
-	frskyDebugSerial->println("Initialization done.");
-#endif
 }
 
 void loop() {
@@ -162,16 +156,25 @@ void sendFrSkyData()
 	
 	if (counter == 25)			// Send 5000 ms frame
 	{
-		frSky->sendFrSky05Hz();
+		frSky->sendFrSky05Hz(frSkySerial, dataProvider);
+#ifdef DEBUFDRSKY
+		frSky->printValues(frskyDebugSerial, dataProvider);
+#endif
 		counter = 0;
 	}
 	else if (counter == 5)		// Send 1000 ms frame
 	{
-		frSky->sendFrSky1Hz();
+		frSky->sendFrSky1Hz(frSkySerial, dataProvider);
+#ifdef DEBUFDRSKY
+		frSky->printValues(frskyDebugSerial, dataProvider);
+#endif
 	}
 	else						// Send 200 ms frame
 	{
-		frSky->sendFrSky5Hz();
+		frSky->sendFrSky5Hz(frSkySerial, dataProvider);
+#ifdef DEBUFDRSKY
+		frSky->printValues(frskyDebugSerial, dataProvider);
+#endif
 	}	
 }
 
@@ -179,7 +182,7 @@ void processData()
 {  
 	while (queue.count() > 0)
 	{ 
-		bool done = p->parse(queue.dequeue());
+		bool done = dataProvider->parse(queue.dequeue());
 
 		if (done && !firstParse)
 		{
@@ -191,7 +194,7 @@ void processData()
 
 #ifdef DEBUG
 		if (done && firstParse)
-			frSky->printValues(debugSerial);
+			frSky->printValues(debugSerial, dataProvider);
 #endif
 	}
 }

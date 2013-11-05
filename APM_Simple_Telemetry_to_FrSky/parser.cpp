@@ -18,7 +18,7 @@
 #define DEBUG
 #include "parser.h"
 
-parser::parser()
+parser::parser(void)
 {
 	f_terms = 0;
 	_state = 0;
@@ -61,7 +61,6 @@ parser::parser(SoftwareSerial* port)
 	debugPort->println("parser initialized.");
 #endif
 }
-
 
 parser::~parser(void)
 {
@@ -211,6 +210,111 @@ bool parser::parse(char c)
   return 0;
 }
 
+float parser::getMainBatteryVoltage()
+{
+	return termToDecimal(0);
+}
+
+float parser::getBatteryCurrent()
+{
+	return termToDecimal(1) / 1000.0f;
+}
+
+int parser::getBatteryRemaining()
+{
+	return (int)termToDecimal(2); 
+}
+
+int parser::getGpsStatus()
+{
+	return (int)termToDecimal(3); // GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
+}
+
+float parser::getLatitude()
+{
+	return gpsDdToDmsFormat(termToDecimal(4) / 10000000.0f);
+}
+
+float parser::getLongitud()
+{
+	return gpsDdToDmsFormat(termToDecimal(5) / 10000000.0f);
+}
+
+float parser::getGpsAltitude()
+{
+	return termToDecimal(6) * 100.0f;
+}
+
+float parser::getGpsHdop()
+{
+	return 0;
+}
+
+int parser::getNumberOfSatelitesInView()
+{
+	return (int)termToDecimal(8);    // GPS Number of satelites in view 
+}
+
+float parser::getGpsGroundSpeed()
+{
+	return termToDecimal(9) * 0.0194384f; // Ground speed in knots
+}
+
+float parser::getGpsCourse()
+{
+	return 0;
+}
+
+float parser::getAltitude()
+{
+	return termToDecimal(11) / 100.0f;
+}
+
+float parser::getHomeAltitude()
+{
+	return termToDecimal(12) / 100.0f;
+}
+
+int parser::getApmMode()
+{
+	return (int)termToDecimal(13);
+}
+
+float parser::getCourse()
+{
+	return termToDecimal(14) / 100.0f; // Course in 1/100 degree
+}
+
+int parser::getThrottle()
+{
+	return (int)termToDecimal(15);
+}
+
+float parser::getAccX()
+{
+	return termToDecimal(17) / 100.0f;
+}
+	
+float parser::getAccY()
+{
+	return termToDecimal(18) / 100.0f;
+}
+
+float parser::getAccZ()
+{
+	return termToDecimal(19) / 100.0f;
+}
+
+int parser::getTime()
+{
+	return 0;
+}
+
+int parser::getDate()
+{
+	return 0;
+}
+
 int parser::terms()
 {
 	return f_terms;
@@ -219,6 +323,22 @@ int parser::terms()
 char* parser::term(int i)
 {
 	return f_term[i];
+}
+
+// We receive the GPS coordinates in ddd.dddd format
+// FrSky wants the dd mm.mmm format so convert.
+float parser::gpsDdToDmsFormat(float ddm)
+{
+	int deg = (int)ddm;
+	float min_dec = (ddm - deg) * 60.0f;
+	float sec = (min_dec - (int)min_dec) * 60.0f;
+	/*
+	float dec_mm = (ddm - (int)ddm) * 60.0f;
+	int mm = (int)dec_mm;
+	int ss = (int)((dec_mm - mm) * 60.0f);
+	return ((int)ddm * 100.0f) + mm + ss / 100.0f;
+	*/
+	return (float)deg * 100.0f + (int)min_dec + sec / 100.0f;
 }
 
 float parser::termToDecimal(int t)
