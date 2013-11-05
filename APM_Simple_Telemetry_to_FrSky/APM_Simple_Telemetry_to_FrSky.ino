@@ -27,7 +27,7 @@
 #define HEARTBEATFREQ 500
 
 //#define DEBUG
-#define DEBUGFRSKY
+//#define DEBUGFRSKY
 
 parser *dataProvider;
 FrSky *frSky;
@@ -157,7 +157,7 @@ void sendFrSkyData()
 	if (counter == 25)			// Send 5000 ms frame
 	{
 		frSky->sendFrSky05Hz(frSkySerial, dataProvider);
-#ifdef DEBUFDRSKY
+#ifdef DEBUGFRSKY
 		frSky->printValues(frskyDebugSerial, dataProvider);
 #endif
 		counter = 0;
@@ -165,14 +165,14 @@ void sendFrSkyData()
 	else if (counter == 5)		// Send 1000 ms frame
 	{
 		frSky->sendFrSky1Hz(frSkySerial, dataProvider);
-#ifdef DEBUFDRSKY
+#ifdef DEBUGFRSKY
 		frSky->printValues(frskyDebugSerial, dataProvider);
 #endif
 	}
 	else						// Send 200 ms frame
 	{
 		frSky->sendFrSky5Hz(frSkySerial, dataProvider);
-#ifdef DEBUFDRSKY
+#ifdef DEBUGFRSKY
 		frSky->printValues(frskyDebugSerial, dataProvider);
 #endif
 	}	
