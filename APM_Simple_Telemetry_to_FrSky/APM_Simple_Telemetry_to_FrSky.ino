@@ -32,8 +32,6 @@
 #define HEARTBEATLED 13
 #define HEARTBEATFREQ 500
 
-
-
 // Do not enable both at the same time
 //#define DEBUG
 //#define DEBUGFRSKY
@@ -136,9 +134,9 @@ void setup() {
 void loop() {
 
 #ifdef MAVLINKTELEMETRY
-	if( dataProvider->enable_mav_request )
+	if( dataProvider->enable_mav_request || (millis() - dataProvider->lastMAVBeat > 5000) )
 	{
-		if(millis() - rateRequestTimer > 1000)
+		if(millis() - rateRequestTimer > 2000)
 		{
 			for(int n = 0; n < 3; n++)
 			{
@@ -197,27 +195,21 @@ void sendFrSkyData()
 {
 	counter++;
 	
-	if (counter == 25)			// Send 5000 ms frame
+	if (counter >= 25)			 // Send 5000 ms frame
 	{
 		frSky->sendFrSky05Hz(frSkySerial, dataProvider);
-#ifdef DEBUGFRSKY
-		frSky->printValues(frskyDebugSerial, dataProvider);
-#endif
 		counter = 0;
 	}
-	else if (counter == 5)		// Send 1000 ms frame
+	else if ((counter % 5) == 0) // Send 1000 ms frame
 	{
 		frSky->sendFrSky1Hz(frSkySerial, dataProvider);
-#ifdef DEBUGFRSKY
-		frSky->printValues(frskyDebugSerial, dataProvider);
+#ifdef DEBUG
+		frSky->printValues(debugSerial, dataProvider);
 #endif
 	}
-	else						// Send 200 ms frame
+	else						 // Send 200 ms frame
 	{
 		frSky->sendFrSky5Hz(frSkySerial, dataProvider);
-#ifdef DEBUGFRSKY
-		frSky->printValues(frskyDebugSerial, dataProvider);
-#endif
 	}	
 }
 
@@ -234,11 +226,6 @@ void processData()
 			debugSerial->println("First parse done. Start sending on frSky port.");
 #endif
 		}
-
-#ifdef DEBUG
-		if (done && firstParse)
-			frSky->printValues(debugSerial, dataProvider);
-#endif
 	}
 }
 

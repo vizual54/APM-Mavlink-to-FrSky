@@ -66,12 +66,12 @@ Mavlink::~Mavlink(void)
 
 float Mavlink::getMainBatteryVoltage()
 {
-	return batteryVoltage / 1000.0f;
+	return batteryVoltage;
 }
 
 float Mavlink::getBatteryCurrent()
 {
-	return current / 1000.0f;
+	return current / 100.0f;
 }
 
 int Mavlink::getBatteryRemaining()
@@ -101,7 +101,7 @@ float Mavlink::getGpsAltitude()
 
 float Mavlink::getGpsHdop()
 {
-	return gpsHdop;
+	return gpsHdop / 100.0f;
 }
 
 int Mavlink::getNumberOfSatelitesInView()
@@ -116,7 +116,7 @@ float Mavlink::getGpsGroundSpeed()
 
 float Mavlink::getGpsCourse()
 {
-	return gpsCourse;
+	return gpsCourse / 100.0f;
 }
 
 float Mavlink::getAltitude()
