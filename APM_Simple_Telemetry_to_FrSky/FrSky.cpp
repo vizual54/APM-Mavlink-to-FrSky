@@ -168,7 +168,7 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		{
 			// Altitude in cm minus Home altitude in cm
 			//float altitude = ((par->termToDecimal(11) - par->termToDecimal(12)) / 100.0f) + 10.0f; // Altitude in Taranis is offset by -10 m
-			float altitude = (dataProvider->getAltitude() - dataProvider->getHomeAltitude()) + 10.0f;
+			float altitude = dataProvider->getAltitude() + 10.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ALTITUDE;
 			frskyBuffer[bufferLength + 2] = lsByte((int)altitude);
@@ -420,13 +420,13 @@ void FrSky::printValues(SoftwareSerial* serialPort, IFrSkyDataProvider* dataProv
 	serialPort->print(" Current: ");
 	serialPort->print(dataProvider->getBatteryCurrent(), 2);
 	serialPort->print(" Fuel: ");
-	serialPort->print(dataProvider->getBatteryRemaining(), 2);
+	serialPort->print(dataProvider->getBatteryRemaining());
 	serialPort->print(" GPS status: ");
 	serialPort->print(dataProvider->getGpsStatus());
 	serialPort->print(" Latitude: ");
-	serialPort->print(dataProvider->getLatitude(), 4);
+	serialPort->print(dataProvider->getLatitude(), 6);
 	serialPort->print(" Longitude: ");
-	serialPort->print(dataProvider->getLongitud(), 4);
+	serialPort->print(dataProvider->getLongitud(), 6);
 	serialPort->print(" GPS Alt: ");
 	serialPort->print(dataProvider->getGpsAltitude(), 2);
 	serialPort->print(" GPS hdop: ");
@@ -438,12 +438,18 @@ void FrSky::printValues(SoftwareSerial* serialPort, IFrSkyDataProvider* dataProv
 	serialPort->print(" GPS Course: ");
 	serialPort->print(dataProvider->getGpsCourse(), 2);
 	serialPort->print(" Home alt: ");
-	serialPort->print(dataProvider->getAltitude() - dataProvider->getHomeAltitude(), 2);
+	serialPort->print(dataProvider->getAltitude(), 2);
 	serialPort->print(" Mode: ");
 	serialPort->print(dataProvider->getApmMode());
 	serialPort->print(" Course: ");
 	serialPort->print(dataProvider->getCourse(), 2);
 	serialPort->print(" RPM: ");
-	serialPort->print(dataProvider->getCourse(), 2);
+	serialPort->print(dataProvider->getThrottle());
+	serialPort->print(" AccX: ");
+	serialPort->print(dataProvider->getAccX(), 2);
+	serialPort->print(" AccY: ");
+	serialPort->print(dataProvider->getAccY(), 2);
+	serialPort->print(" AccZ: ");
+	serialPort->print(dataProvider->getAccZ(), 2);
 	serialPort->println("");
 }

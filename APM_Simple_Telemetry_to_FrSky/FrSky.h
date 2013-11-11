@@ -22,7 +22,7 @@
 //#define lowByte(w) ((uint8_t) ((w) & 0xff))
 //#define highByte(w) ((uint8_t) ((w) >> 8))
 
-#include "parser.h"
+#include "SimpleTelemetry.h"
 #include <SoftwareSerial.h>
 #include "defines.h"
 

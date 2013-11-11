@@ -15,10 +15,10 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#define DEBUG
-#include "parser.h"
 
-parser::parser(void)
+#include "SimpleTelemetry.h"
+
+SimpleTelemetry::SimpleTelemetry(void)
 {
 	f_terms = 0;
 	_state = 0;
@@ -38,39 +38,16 @@ parser::parser(void)
 	}
 }
 
-parser::parser(SoftwareSerial* port)
-{
-	debugPort = port;
-	f_terms = 0;
-	_state = 0;
-	n = 0;
-	_terms = 0;
-	_nt = 0;
-
-        // allocate memory for individual terms of sentence in parser
-	for (int t=0; t<MAXTERMS; t++) {
-		_term[t] = (char*) malloc (MAXWORD * sizeof(char));
-		f_term[t] = (char*) malloc (MAXWORD * sizeof(char));
-		//(f_term[t])[0] = 0;
-		for (int c = 0; c < MAXWORD; c++)
-		{
-			(f_term[t])[c] = 0;
-		}
-	}
-#ifdef DEBUG
-	debugPort->println("parser initialized.");
-#endif
-}
-
-parser::~parser(void)
+SimpleTelemetry::~SimpleTelemetry(void)
 {
 }
 
-bool parser::parse(char c)
+bool SimpleTelemetry::parseMessage(char c)
 {
 	// Dont let sentences run away
 	if ((n >= MAXSENTENCE) || (_terms >= MAXTERMS) || (_nt >= MAXWORD))
 	{
+/*
 #ifdef DEBUG
 		debugPort->println("Runaway sentance. Resetting state. ");
 		debugPort->print("Sentence is: ");
@@ -81,6 +58,7 @@ bool parser::parse(char c)
 		debugPort->print(_nt);
 		debugPort->println(" words.");
 #endif
+*/
 		_state = 0;
 		n = 0;
 		_terms = 0;
@@ -89,17 +67,21 @@ bool parser::parse(char c)
 	// LF and CR always reset parser
 	if ((c == 0x0A) || (c == 0x0D))
 	{
+/*
 #ifdef DEBUG
 		debugPort->println("LF or CR received. Resetting state.");
 #endif
+*/
 		_state = 0;
 	}
 	// $ Always starts a new sentence
 	if (c == '$')
 	{
+/*
 #ifdef DEBUG
 	debugPort->println("New sentence.");
 #endif
+*/
 		//_sentence[0] = c;
 		_state = 1;
 		_terms = 0;
@@ -114,9 +96,11 @@ bool parser::parse(char c)
 		case 0 :
 		{
 			// Waiting for $. Do nothing
+/*
 #ifdef DEBUG
 			debugPort->println("Waiting for $.");
 #endif
+*/
 			break;
 		}
 		case 1 :
@@ -128,9 +112,11 @@ bool parser::parse(char c)
 			// Delimits the terms in sentence
 				case ',' :
 				{
+/*
 #ifdef DEBUG
 					debugPort->print(",");
 #endif
+*/
 					(_term[_terms++])[_nt] = 0;
 					_nt = 0;
 					checksum = checksum ^ c;
@@ -139,9 +125,11 @@ bool parser::parse(char c)
 				// End of terms
 				case '*' :
 				{
+/*
 #ifdef DEBUG
 					debugPort->print("*");
 #endif
+*/
 					(_term[_terms++])[_nt] = 0;
 					_nt = 0;
 					_state++;
@@ -150,9 +138,11 @@ bool parser::parse(char c)
 				// All characters between $ and *
 				default :
 				{
+/*
 #ifdef DEBUG
 					debugPort->print(c);
 #endif
+*/
 					(_term[_terms])[_nt++] = c;
 					checksum = checksum ^ c;
 					break;
@@ -163,9 +153,11 @@ bool parser::parse(char c)
 		// Checksum MSB
 		case 2 :
 		{
+/*
 #ifdef DEBUG
 			debugPort->print(c);
 #endif
+*/
 			checksum = checksum - (16 * _dehex(c));
 			_state++;
 			break;
@@ -173,17 +165,20 @@ bool parser::parse(char c)
 		// Sentence complete
 		case 3 :
 		{
+/*
 #ifdef DEBUG
 			debugPort->println(c);
 #endif
+*/
 			checksum = checksum - _dehex(c);
+/*
 #ifdef DEBUG
 			debugPort->print("Scentence complete. Checksum is: ");
 			debugPort->println(checksum, HEX);
 #endif
+*/
 			if (checksum == 0)
 			{
-				debugPort->println("Checksum ok. Copying terms to f_terms.");
 				for (f_terms=0; f_terms<_terms; f_terms++)
 				{
 					_nt = 0;
@@ -210,124 +205,119 @@ bool parser::parse(char c)
   return 0;
 }
 
-float parser::getMainBatteryVoltage()
+float SimpleTelemetry::getMainBatteryVoltage()
 {
 	return termToDecimal(0);
 }
 
-float parser::getBatteryCurrent()
+float SimpleTelemetry::getBatteryCurrent()
 {
 	return termToDecimal(1) / 1000.0f;
 }
 
-int parser::getBatteryRemaining()
+int SimpleTelemetry::getBatteryRemaining()
 {
 	return (int)termToDecimal(2); 
 }
 
-int parser::getGpsStatus()
+int SimpleTelemetry::getGpsStatus()
 {
 	return (int)termToDecimal(3); // GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
 }
 
-float parser::getLatitude()
+float SimpleTelemetry::getLatitude()
 {
 	return gpsDdToDmsFormat(termToDecimal(4) / 10000000.0f);
 }
 
-float parser::getLongitud()
+float SimpleTelemetry::getLongitud()
 {
 	return gpsDdToDmsFormat(termToDecimal(5) / 10000000.0f);
 }
 
-float parser::getGpsAltitude()
+float SimpleTelemetry::getGpsAltitude()
 {
-	return termToDecimal(6) * 100.0f;
+	return termToDecimal(6) / 100.0f;
 }
 
-float parser::getGpsHdop()
+float SimpleTelemetry::getGpsHdop()
 {
-	return 0;
+	return termToDecimal(7) / 100.0f;
 }
 
-int parser::getNumberOfSatelitesInView()
+int SimpleTelemetry::getNumberOfSatelitesInView()
 {
 	return (int)termToDecimal(8);    // GPS Number of satelites in view 
 }
 
-float parser::getGpsGroundSpeed()
+float SimpleTelemetry::getGpsGroundSpeed()
 {
 	return termToDecimal(9) * 0.0194384f; // Ground speed in knots
 }
 
-float parser::getGpsCourse()
+float SimpleTelemetry::getGpsCourse()
 {
 	return 0;
 }
 
-float parser::getAltitude()
+float SimpleTelemetry::getAltitude()
 {
-	return termToDecimal(11) / 100.0f;
+	return (termToDecimal(11) - termToDecimal(12)) / 100.0f;
 }
 
-float parser::getHomeAltitude()
-{
-	return termToDecimal(12) / 100.0f;
-}
-
-int parser::getApmMode()
+int SimpleTelemetry::getApmMode()
 {
 	return (int)termToDecimal(13);
 }
 
-float parser::getCourse()
+float SimpleTelemetry::getCourse()
 {
 	return termToDecimal(14) / 100.0f; // Course in 1/100 degree
 }
 
-int parser::getThrottle()
+int SimpleTelemetry::getThrottle()
 {
 	return (int)termToDecimal(15);
 }
 
-float parser::getAccX()
+float SimpleTelemetry::getAccX()
+{
+	return termToDecimal(16) / 100.0f;
+}
+	
+float SimpleTelemetry::getAccY()
 {
 	return termToDecimal(17) / 100.0f;
 }
-	
-float parser::getAccY()
+
+float SimpleTelemetry::getAccZ()
 {
 	return termToDecimal(18) / 100.0f;
 }
 
-float parser::getAccZ()
-{
-	return termToDecimal(19) / 100.0f;
-}
-
-int parser::getTime()
+int SimpleTelemetry::getTime()
 {
 	return 0;
 }
 
-int parser::getDate()
+int SimpleTelemetry::getDate()
 {
 	return 0;
 }
 
-int parser::terms()
+int SimpleTelemetry::terms()
 {
 	return f_terms;
 }
 
-char* parser::term(int i)
+char* SimpleTelemetry::term(int i)
 {
 	return f_term[i];
 }
 
 // We receive the GPS coordinates in ddd.dddd format
 // FrSky wants the dd mm.mmm format so convert.
-float parser::gpsDdToDmsFormat(float ddm)
+float SimpleTelemetry::gpsDdToDmsFormat(float ddm)
 {
 	int deg = (int)ddm;
 	float min_dec = (ddm - deg) * 60.0f;
@@ -341,7 +331,7 @@ float parser::gpsDdToDmsFormat(float ddm)
 	return (float)deg * 100.0f + (int)min_dec + sec / 100.0f;
 }
 
-float parser::termToDecimal(int t)
+float SimpleTelemetry::termToDecimal(int t)
 {
 	char *s = f_term[t];
 	long  rl = 0;
@@ -386,7 +376,7 @@ float parser::termToDecimal(int t)
 	return rr;
 }
 
-int parser::_dehex(char a) {
+int SimpleTelemetry::_dehex(char a) {
 	// returns base-16 value of chars '0'-'9' and 'A'-'F';
 	// does not trap invalid chars!
   if (int(a) >= 65) {

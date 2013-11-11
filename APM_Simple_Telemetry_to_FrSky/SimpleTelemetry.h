@@ -39,8 +39,8 @@
 // 18 Accel-Z
 // * - end
 
-#ifndef parser_h
-#define parser_h
+#ifndef simpletelemetry_h
+#define simpletelemetry_h
 
 #define MAXTERMS 21
 #define MAXSENTENCE 110
@@ -51,13 +51,12 @@
 #include <Arduino.h>
 #include "defines.h"
 
-class parser :	public IFrSkyDataProvider
+class SimpleTelemetry :	public IFrSkyDataProvider
 {
 public:
-	parser(void);
-	parser(SoftwareSerial* port);
-	~parser(void);
-	bool	parse(char c);
+	SimpleTelemetry(void);
+	~SimpleTelemetry(void);
+	bool	parseMessage(char c);
 	float	getMainBatteryVoltage(); 
 	float	getBatteryCurrent();
 	int		getBatteryRemaining();
@@ -70,7 +69,6 @@ public:
 	float	getGpsGroundSpeed();
 	float	getGpsCourse();
 	float	getAltitude();
-	float	getHomeAltitude();
 	int		getApmMode();
 	float	getCourse();
 	int		getThrottle();	

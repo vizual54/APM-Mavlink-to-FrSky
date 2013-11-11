@@ -15,44 +15,63 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#undef PROGMEM 
+#define PROGMEM __attribute__(( section(".progmem.data") )) 
+
+#undef PSTR 
+#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
+
 #include <SoftwareSerial.h>
 #include <FlexiTimer2.h>
-#include "parser.h"
+#include <FastSerial.h>
+#include "SimpleTelemetry.h"
 #include "Mavlink.h"
-#include "ifrskydataprovider.h"
 #include "FrSky.h"
 #include "SimpleFIFO.h"
-
+#include <GCS_MAVLink.h>
 #define HEARTBEATLED 13
 #define HEARTBEATFREQ 500
 
+
+
+// Do not enable both at the same time
 //#define DEBUG
 //#define DEBUGFRSKY
 
-parser *dataProvider;
+// Comment this to run simple telemetry protocl
+#define MAVLINKTELEMETRY
+
+#ifdef MAVLINKTELEMETRY
+Mavlink *dataProvider;
+#else
+SimpleTelemetry *dataProvider;
+#endif
+
+FastSerialPort0(Serial);
 FrSky *frSky;
 SoftwareSerial *frSkySerial;
+
 #ifdef DEBUG
 SoftwareSerial *debugSerial;
-#endif
-#ifdef DEBUGFRSKY
+#elif defined DEBUGFRSKY
 SoftwareSerial *frskyDebugSerial;
 #endif
 
 SimpleFIFO<char, 128> queue;
 
 int		counter = 0;
-long	hbMillis;
+unsigned long	hbMillis = 0;
+unsigned long	rateRequestTimer = 0;
 byte	hbState;
 bool	firstParse = false;
 
 void setup() {
+
+// Debug serial port pin 11 rx, 12 tx
 #ifdef DEBUG
-	// Debug serial port pin 11 rx, 12 tx
 	debugSerial = new SoftwareSerial(12, 11);
 	debugSerial->begin(38400);
-#endif
-#ifdef DEBUGFRSKY
+#elif defined DEBUGFRSKY
 	frskyDebugSerial = new SoftwareSerial(12, 11);
 	frskyDebugSerial->begin(38400);
 #endif
@@ -70,12 +89,13 @@ void setup() {
 	debugSerial->print(freeRam());
 	debugSerial->println(" bytes");
 #endif
-
-#ifndef DEBUG
-	dataProvider = new parser();
+#ifdef MAVLINKTELEMETRY
+	dataProvider = new Mavlink(&Serial);
 #else
-	dataProvider = new parser(debugSerial);
+	dataProvider = new SimpleTelemetry();
 #endif
+	
+	
 	frSky = new FrSky();
 
 	digitalWrite(HEARTBEATLED, HIGH);
@@ -114,12 +134,35 @@ void setup() {
 }
 
 void loop() {
-	
+
+#ifdef MAVLINKTELEMETRY
+	if( dataProvider->enable_mav_request )
+	{
+		if(millis() - rateRequestTimer > 1000)
+		{
+			for(int n = 0; n < 3; n++)
+			{
+#ifdef DEBUG
+				debugSerial->println("Making rate request.");
+#endif
+				dataProvider->makeRateRequest();
+				delay(50);
+			}
+			
+			dataProvider->enable_mav_request = 0;
+			dataProvider->waitingMAVBeats = 0;
+			rateRequestTimer = millis();
+		}
+		
+	}
+#endif
+
 	while (Serial.available() > 0)
 	{
 		if (queue.count() < 128)
 		{
-			queue.enqueue(Serial.read());	
+			char c = Serial.read();
+			queue.enqueue(c);
 		}
 		else
 		{
@@ -182,7 +225,7 @@ void processData()
 {  
 	while (queue.count() > 0)
 	{ 
-		bool done = dataProvider->parse(queue.dequeue());
+		bool done = dataProvider->parseMessage(queue.dequeue());
 
 		if (done && !firstParse)
 		{
@@ -201,9 +244,9 @@ void processData()
 
 
 int freeRam () {
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+	extern int __heap_start, *__brkval; 
+	int v; 
+	return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
 
 
