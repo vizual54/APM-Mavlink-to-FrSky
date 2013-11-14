@@ -106,9 +106,9 @@ float Mavlink::getGpsHdop()
 	return gpsHdop / 100.0f;
 }
 
-int Mavlink::getNumberOfSatelitesInView()
-{
-	return numberOfSatelites;
+int Mavlink::getTemp2()
+{	
+	return gpsStatus * 10 + numberOfSatelites;
 }
 
 float Mavlink::getGpsGroundSpeed()
@@ -116,17 +116,12 @@ float Mavlink::getGpsGroundSpeed()
 	return gpsGroundSpeed * 0.0194384f;
 }
 
-float Mavlink::getGpsCourse()
-{
-	return gpsCourse / 100.0f;
-}
-
 float Mavlink::getAltitude()
 {
 	return altitude / 100.0f;
 }
 
-int Mavlink::getApmMode()
+int Mavlink::getTemp1()
 {
 	return apmMode;
 }
@@ -136,7 +131,7 @@ float Mavlink::getCourse()
 	return course;
 }
 
-int Mavlink::getThrottle()
+int Mavlink::getEngineSpeed()
 {
 	return throttle;
 }
@@ -154,6 +149,11 @@ float Mavlink::getAccY()
 float Mavlink::getAccZ()
 {
 	return accZ;
+}
+
+int Mavlink::getYear()
+{
+	return 0;
 }
 
 int	Mavlink::getTime()

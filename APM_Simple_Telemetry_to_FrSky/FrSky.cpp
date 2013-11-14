@@ -109,8 +109,7 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		case TEMP1 :
 		{
 			// APM mode
-			//int temp1 = (int)par->termToDecimal(13);
-			int temp1 = dataProvider->getApmMode();
+			int temp1 = dataProvider->getTemp1();
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP1;
 			frskyBuffer[bufferLength + 2] = lsByte(temp1);
@@ -123,7 +122,7 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		{
 			// Throttle out
 			//int engineSpeed = (int)par->termToDecimal(15) / 30;
-			int engineSpeed = dataProvider->getThrottle() / 30;
+			int engineSpeed = dataProvider->getEngineSpeed() / 30;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = RPM;
 			frskyBuffer[bufferLength + 2] = lsByte(engineSpeed);
@@ -147,11 +146,7 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		case TEMP2 :
 		{
 			// GPS status mode, number of satelites in view
-			//int nrSats = (int)par->termToDecimal(8);    // GPS Number of satelites in view 
-			//int gpsStatus = (int)par->termToDecimal(3); // GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix
-			int nrSats = dataProvider->getNumberOfSatelitesInView();
-			int gpsStatus = dataProvider->getGpsStatus();
-			int value = gpsStatus * 10 + nrSats;
+			int value = dataProvider->getTemp2();
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TEMP2;
 			frskyBuffer[bufferLength + 2] = lsByte(value);
@@ -274,26 +269,28 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		}
 		case DATE :
 		{
-			float date = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = DATE;
-			frskyBuffer[bufferLength + 2] = lsByte((int)date);
-			frskyBuffer[bufferLength + 3] = msByte((int)date);
+			frskyBuffer[bufferLength + 2] = lsByte(dataProvider->getDate());
+			frskyBuffer[bufferLength + 3] = msByte(dataProvider->getDate());
 			return 4;
 			break;
 		}
 		case YEAR :
 		{
-			return 0;
+			frskyBuffer[bufferLength] = header_value;
+			frskyBuffer[bufferLength + 1] = DATE;
+			frskyBuffer[bufferLength + 2] = lsByte(dataProvider->getYear());
+			frskyBuffer[bufferLength + 3] = msByte(dataProvider->getYear());
+			return 4;
 			break;
 		}
 		case TIME :
 		{
-			float time = 0.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = TIME;
-			frskyBuffer[bufferLength + 2] = lsByte((int)time);
-			frskyBuffer[bufferLength + 3] = msByte((int)time);
+			frskyBuffer[bufferLength + 2] = lsByte(dataProvider->getTime());
+			frskyBuffer[bufferLength + 3] = msByte(dataProvider->getTime());
 			return 4;
 			break;
 		}
@@ -421,30 +418,26 @@ void FrSky::printValues(SoftwareSerial* serialPort, IFrSkyDataProvider* dataProv
 	serialPort->print(dataProvider->getBatteryCurrent(), 2);
 	serialPort->print(" Fuel: ");
 	serialPort->print(dataProvider->getBatteryRemaining());
-	serialPort->print(" GPS status: ");
-	serialPort->print(dataProvider->getGpsStatus());
 	serialPort->print(" Latitude: ");
 	serialPort->print(dataProvider->getLatitude(), 6);
 	serialPort->print(" Longitude: ");
 	serialPort->print(dataProvider->getLongitud(), 6);
 	serialPort->print(" GPS Alt: ");
 	serialPort->print(dataProvider->getGpsAltitude(), 2);
-	serialPort->print(" GPS hdop: ");
-	serialPort->print(dataProvider->getGpsHdop(), 2);
-	serialPort->print(" GPS sats: ");
-	serialPort->print(dataProvider->getNumberOfSatelitesInView());
+	//serialPort->print(" GPS hdop: ");
+	//serialPort->print(dataProvider->getGpsHdop(), 2);
+	serialPort->print(" GPS status + sats: ");
+	serialPort->print(dataProvider->getTemp2());
 	serialPort->print(" GPS speed: ");
 	serialPort->print(dataProvider->getGpsGroundSpeed(), 2);
-	serialPort->print(" GPS Course: ");
-	serialPort->print(dataProvider->getGpsCourse(), 2);
 	serialPort->print(" Home alt: ");
 	serialPort->print(dataProvider->getAltitude(), 2);
 	serialPort->print(" Mode: ");
-	serialPort->print(dataProvider->getApmMode());
+	serialPort->print(dataProvider->getTemp1());
 	serialPort->print(" Course: ");
 	serialPort->print(dataProvider->getCourse(), 2);
 	serialPort->print(" RPM: ");
-	serialPort->print(dataProvider->getThrottle());
+	serialPort->print(dataProvider->getEngineSpeed());
 	serialPort->print(" AccX: ");
 	serialPort->print(dataProvider->getAccX(), 2);
 	serialPort->print(" AccY: ");

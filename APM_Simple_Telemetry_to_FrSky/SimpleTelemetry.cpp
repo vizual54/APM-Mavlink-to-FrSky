@@ -245,9 +245,10 @@ float SimpleTelemetry::getGpsHdop()
 	return termToDecimal(7) / 100.0f;
 }
 
-int SimpleTelemetry::getNumberOfSatelitesInView()
+int SimpleTelemetry::getTemp2()
 {
-	return (int)termToDecimal(8);    // GPS Number of satelites in view 
+	// GPS Status 0:No Fix, 2:2D Fix, 3:3D Fix + GPS Number of satelites in view 
+	return (int)termToDecimal(3) * 10 + (int)termToDecimal(8);
 }
 
 float SimpleTelemetry::getGpsGroundSpeed()
@@ -255,17 +256,12 @@ float SimpleTelemetry::getGpsGroundSpeed()
 	return termToDecimal(9) * 0.0194384f; // Ground speed in knots
 }
 
-float SimpleTelemetry::getGpsCourse()
-{
-	return 0;
-}
-
 float SimpleTelemetry::getAltitude()
 {
 	return (termToDecimal(11) - termToDecimal(12)) / 100.0f;
 }
 
-int SimpleTelemetry::getApmMode()
+int SimpleTelemetry::getTemp1()
 {
 	return (int)termToDecimal(13);
 }
@@ -275,7 +271,7 @@ float SimpleTelemetry::getCourse()
 	return termToDecimal(14) / 100.0f; // Course in 1/100 degree
 }
 
-int SimpleTelemetry::getThrottle()
+int SimpleTelemetry::getEngineSpeed()
 {
 	return (int)termToDecimal(15);
 }
@@ -293,6 +289,11 @@ float SimpleTelemetry::getAccY()
 float SimpleTelemetry::getAccZ()
 {
 	return termToDecimal(18) / 100.0f;
+}
+
+int SimpleTelemetry::getYear()
+{
+	return 0;
 }
 
 int SimpleTelemetry::getTime()

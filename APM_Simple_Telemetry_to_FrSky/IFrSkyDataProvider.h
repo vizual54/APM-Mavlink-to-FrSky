@@ -21,25 +21,23 @@ class IFrSkyDataProvider
 public:
 	//IFrSkyDataProvider(void);
 	//~IFrSkyDataProvider(void);
-	virtual float	getMainBatteryVoltage() = 0;
-	virtual float	getBatteryCurrent() = 0;
-	virtual int		getBatteryRemaining() = 0;
-	virtual int		getGpsStatus() = 0;
-	virtual float	getLatitude() = 0;
-	virtual float	getLongitud() = 0;
 	virtual float	getGpsAltitude() = 0;
-	virtual float	getGpsHdop() = 0;
-	virtual int		getNumberOfSatelitesInView() = 0;
-	virtual float	getGpsGroundSpeed() = 0;
-	virtual float	getGpsCourse() = 0;
+	virtual int		getTemp1() = 0;
+	virtual int		getEngineSpeed() = 0;
+	virtual int		getBatteryRemaining() = 0;
+	virtual int		getTemp2() = 0;
 	virtual float	getAltitude() = 0;
-	virtual int		getApmMode() = 0;
+	virtual float	getGpsGroundSpeed() = 0;
+	virtual float	getLongitud() = 0;
+	virtual float	getLatitude() = 0;
 	virtual float	getCourse() = 0;
-	virtual int		getThrottle() = 0;
+	virtual int		getYear() = 0;
+	virtual int		getDate() = 0;
+	virtual int		getTime() = 0;
 	virtual float	getAccX() = 0;
 	virtual float	getAccY() = 0;
 	virtual float	getAccZ() = 0;
-	virtual int		getTime() = 0;
-	virtual int		getDate() = 0;
+	virtual float	getBatteryCurrent() = 0;
+	virtual float	getMainBatteryVoltage() = 0;
 };
 
