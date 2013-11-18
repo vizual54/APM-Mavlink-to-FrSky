@@ -56,30 +56,33 @@ class SimpleTelemetry :	public IFrSkyDataProvider
 public:
 	SimpleTelemetry(void);
 	~SimpleTelemetry(void);
-	bool	parseMessage(char c);
-	float	getMainBatteryVoltage(); 
-	float	getBatteryCurrent();
-	int		getBatteryRemaining();
-	int		getGpsStatus();
-	float	getLatitude();
-	float	getLongitud();
-	float	getGpsAltitude();
-	float	getGpsHdop();
-	int		getTemp2();
-	float	getGpsGroundSpeed();
-	float	getAltitude();
-	int		getTemp1();
-	float	getCourse();
-	int		getEngineSpeed();	
-	float	getAccX();
-	float	getAccY();
-	float	getAccZ();
-	int     getYear();
-	int		getTime();
-	int     getDate();
-	int		terms();
-	char*	term(int i);
-	float	termToDecimal(int t);
+	bool		parseMessage(char c);
+	const float	getGpsHdop();
+	int			terms();
+	char*		term(int i);
+	float		termToDecimal(int t);
+	const int	getGpsStatus();
+
+	// IFrSkyDataProvider functions
+	const float	getGpsAltitude();
+	const int	getTemp1();
+	const int	getEngineSpeed();
+	const int	getFuelLevel();
+	const int	getTemp2();
+	const float	getAltitude();
+	const float	getGpsGroundSpeed();
+	const float	getLongitud();
+	const float	getLatitude();
+	const float	getCourse();
+	const int   getYear();
+	const int   getDate();
+	const int	getTime();
+	const float	getAccX();
+	const float	getAccY();
+	const float	getAccZ(); 
+	const float	getBatteryCurrent();
+	const float	getMainBatteryVoltage();	
+
 private:
 	int _dehex(char a);
 	float gpsDdToDmsFormat(float ddm);

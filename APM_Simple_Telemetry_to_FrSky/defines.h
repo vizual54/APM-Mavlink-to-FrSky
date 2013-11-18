@@ -25,9 +25,6 @@ typedef unsigned char byte;
 
 
 
-//#define lowByte(w) ((uint8_t) ((w) & 0xff))
-//#define highByte(w) ((uint8_t) ((w) >> 8))
-
 #define header_value   0x5e
 #define tail_value     0x5e
 #define escape_value   0x5d

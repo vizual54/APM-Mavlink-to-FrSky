@@ -31,32 +31,34 @@ class Mavlink :	public IFrSkyDataProvider
 public:
 	Mavlink(BetterStream* port);
 	~Mavlink(void);
-	float			getMainBatteryVoltage(); 
-	float			getBatteryCurrent();
-	int				getBatteryRemaining();
-	int				getGpsStatus();
-	float			getLatitude();
-	float			getLongitud();
-	float			getGpsAltitude();
-	float			getGpsHdop();
-	int				getTemp2();
-	float			getGpsGroundSpeed();
-	float			getAltitude();
-	int				getTemp1();
-	float			getCourse();
-	int				getEngineSpeed();
-	float			getAccX();
-	float			getAccY();
-	float			getAccZ();
-	int				getYear();
-	int				getTime();
-	int				getDate();
 	bool			parseMessage(char c);
 	void			makeRateRequest();
 	bool			enable_mav_request;
 	bool			mavlink_active;
 	bool			waitingMAVBeats;
 	unsigned long	lastMAVBeat;
+	const int		getGpsStatus();
+	const float		getGpsHdop();
+
+	// IFrSkyDataProvider functions
+	const float		getGpsAltitude();
+	const int		getTemp1();
+	const int		getEngineSpeed();
+	const int		getFuelLevel();
+	const int		getTemp2();
+	const float		getAltitude();
+	const float		getGpsGroundSpeed();
+	const float		getLongitud();
+	const float		getLatitude();
+	const float		getCourse();
+	const int		getYear();
+	const int		getDate();
+	const int		getTime();
+	const float		getAccX();
+	const float		getAccY();
+	const float		getAccZ(); 
+	const float		getBatteryCurrent();
+	const float		getMainBatteryVoltage();
 
 private:
 	SoftwareSerial  *debugPort;

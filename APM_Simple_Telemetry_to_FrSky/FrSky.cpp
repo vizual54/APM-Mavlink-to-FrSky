@@ -121,7 +121,6 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		case RPM :
 		{
 			// Throttle out
-			//int engineSpeed = (int)par->termToDecimal(15) / 30;
 			int engineSpeed = dataProvider->getEngineSpeed() / 30;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = RPM;
@@ -133,8 +132,7 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		case FUEL :
 		{
 			// Battery remaining in %
-			//int fuelLevel = (int)par->termToDecimal(2); 
-			int fuelLevel = dataProvider->getBatteryRemaining();
+			int fuelLevel = dataProvider->getFuelLevel();
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = FUEL;
 			frskyBuffer[bufferLength + 2] = lsByte(fuelLevel);
@@ -162,7 +160,7 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		case ALTITUDE :
 		{
 			// Altitude in cm minus Home altitude in cm
-			//float altitude = ((par->termToDecimal(11) - par->termToDecimal(12)) / 100.0f) + 10.0f; // Altitude in Taranis is offset by -10 m
+			// Altitude in Taranis is offset by -10 m
 			float altitude = dataProvider->getAltitude() + 10.0f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = ALTITUDE;
@@ -181,7 +179,7 @@ unsigned char FrSky::addBufferData(const char id, IFrSkyDataProvider* dataProvid
 		case GPSSPEED :
 		{
 			// GPS Ground speed in knots
-			//float gpsSpeed = par->termToDecimal(9) * 0.0194384f / 1.84f; // Seems like there is an offset of 1.84 for some reason
+			// Seems like there is an offset of 1.84 for some reason
 			float gpsSpeed  = dataProvider->getGpsGroundSpeed() / 1.84f;
 			frskyBuffer[bufferLength] = header_value;
 			frskyBuffer[bufferLength + 1] = GPSSPEED;
@@ -417,7 +415,7 @@ void FrSky::printValues(SoftwareSerial* serialPort, IFrSkyDataProvider* dataProv
 	serialPort->print(" Current: ");
 	serialPort->print(dataProvider->getBatteryCurrent(), 2);
 	serialPort->print(" Fuel: ");
-	serialPort->print(dataProvider->getBatteryRemaining());
+	serialPort->print(dataProvider->getFuelLevel());
 	serialPort->print(" Latitude: ");
 	serialPort->print(dataProvider->getLatitude(), 6);
 	serialPort->print(" Longitude: ");

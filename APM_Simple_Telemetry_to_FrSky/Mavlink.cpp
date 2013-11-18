@@ -66,102 +66,102 @@ Mavlink::~Mavlink(void)
 {
 }
 
-float Mavlink::getMainBatteryVoltage()
+const float Mavlink::getMainBatteryVoltage()
 {
 	return batteryVoltage;
 }
 
-float Mavlink::getBatteryCurrent()
+const float Mavlink::getBatteryCurrent()
 {
 	return current / 100.0f;
 }
 
-int Mavlink::getBatteryRemaining()
+const int Mavlink::getFuelLevel()
 {
 	return batteryRemaining;
 }
 
-int Mavlink::getGpsStatus()
+const int Mavlink::getGpsStatus()
 {
 	return gpsStatus;
 }
 
-float Mavlink::getLatitude()
+const float Mavlink::getLatitude()
 {
 	return gpsDdToDmsFormat(latitude / 10000000.0f);
 }
 
-float Mavlink::getLongitud()
+const float Mavlink::getLongitud()
 {
 	return gpsDdToDmsFormat(longitude / 10000000.0f);
 }
 
-float Mavlink::getGpsAltitude()
+const float Mavlink::getGpsAltitude()
 {
 	return gpsAltitude / 100.0f;
 }
 
-float Mavlink::getGpsHdop()
+const float Mavlink::getGpsHdop()
 {
 	return gpsHdop / 100.0f;
 }
 
-int Mavlink::getTemp2()
+const int Mavlink::getTemp2()
 {	
 	return gpsStatus * 10 + numberOfSatelites;
 }
 
-float Mavlink::getGpsGroundSpeed()
+const float Mavlink::getGpsGroundSpeed()
 {
 	return gpsGroundSpeed * 0.0194384f;
 }
 
-float Mavlink::getAltitude()
+const float Mavlink::getAltitude()
 {
 	return altitude / 100.0f;
 }
 
-int Mavlink::getTemp1()
+const int Mavlink::getTemp1()
 {
 	return apmMode;
 }
 
-float Mavlink::getCourse()
+const float Mavlink::getCourse()
 {
 	return course;
 }
 
-int Mavlink::getEngineSpeed()
+const int Mavlink::getEngineSpeed()
 {
 	return throttle;
 }
 
-float Mavlink::getAccX()
+const float Mavlink::getAccX()
 {
 	return accX;
 }
 	
-float Mavlink::getAccY()
+const float Mavlink::getAccY()
 {
 	return accY;
 }
 
-float Mavlink::getAccZ()
+const float Mavlink::getAccZ()
 {
 	return accZ;
 }
 
-int Mavlink::getYear()
+const int Mavlink::getYear()
 {
 	return 0;
 }
 
-int	Mavlink::getTime()
+const int Mavlink::getTime()
 {
 	return 0;
 }
 
-int	Mavlink::getDate()
+const int Mavlink::getDate()
 {
 	return 0;
 }
