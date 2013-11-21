@@ -15,10 +15,16 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+#undef PROGMEM 
+#define PROGMEM __attribute__(( section(".progmem.data") )) 
+
+#undef PSTR 
+#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
+
 #include <SoftwareSerial.h>
 #include <FlexiTimer2.h>
 #include <FastSerial.h>
-#include "parser.h"
+#include "SimpleTelemetry.h"
 #include "Mavlink.h"
 #include "FrSky.h"
 #include "SimpleFIFO.h"
@@ -26,25 +32,17 @@
 #define HEARTBEATLED 13
 #define HEARTBEATFREQ 500
 
-#undef PROGMEM 
-#define PROGMEM __attribute__(( section(".progmem.data") )) 
-
-#undef PSTR 
-#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];})) 
-
-//#define MAVLINK_USE_CONVENIENCE_FUNCTIONS
 // Do not enable both at the same time
-#define DEBUG
+//#define DEBUG
 //#define DEBUGFRSKY
 
-// Do not enable both at the same time
-//#define SIMPLETELEMETRY
-#define MAVLINK
+// Comment this to run simple telemetry protocl
+#define MAVLINKTELEMETRY
 
-#ifdef MAVLINK
+#ifdef MAVLINKTELEMETRY
 Mavlink *dataProvider;
 #else
-parser *dataProvider;
+SimpleTelemetry *dataProvider;
 #endif
 
 FastSerialPort0(Serial);
@@ -53,16 +51,15 @@ SoftwareSerial *frSkySerial;
 
 #ifdef DEBUG
 SoftwareSerial *debugSerial;
-#endif
-#ifdef DEBUGFRSKY
+#elif defined DEBUGFRSKY
 SoftwareSerial *frskyDebugSerial;
 #endif
 
 SimpleFIFO<char, 128> queue;
 
 int		counter = 0;
-long	hbMillis = 0;
-long	rateRequestTimer = 0;
+unsigned long	hbMillis = 0;
+unsigned long	rateRequestTimer = 0;
 byte	hbState;
 bool	firstParse = false;
 
@@ -90,12 +87,12 @@ void setup() {
 	debugSerial->print(freeRam());
 	debugSerial->println(" bytes");
 #endif
-
-#ifdef MAVLINK
+#ifdef MAVLINKTELEMETRY
 	dataProvider = new Mavlink(&Serial);
 #else
-	dataProvider = new parser();
+	dataProvider = new SimpleTelemetry();
 #endif
+	
 	
 	frSky = new FrSky();
 
@@ -136,18 +133,27 @@ void setup() {
 
 void loop() {
 
-	if(!dataProvider->isMavlinkActive())
+#ifdef MAVLINKTELEMETRY
+	if( dataProvider->enable_mav_request || (millis() - dataProvider->lastMAVBeat > 5000) )
 	{
-		if(millis() - rateRequestTimer > 1000)
+		if(millis() - rateRequestTimer > 2000)
 		{
-			rateRequestTimer = millis();
+			for(int n = 0; n < 3; n++)
+			{
 #ifdef DEBUG
-			debugSerial->println("Making rate request.");
+				debugSerial->println("Making rate request.");
 #endif
-			dataProvider->makeRateRequest();
+				dataProvider->makeRateRequest();
+				delay(50);
+			}
+			
+			dataProvider->enable_mav_request = 0;
+			dataProvider->waitingMAVBeats = 0;
+			rateRequestTimer = millis();
 		}
 		
 	}
+#endif
 
 	while (Serial.available() > 0)
 	{
@@ -189,27 +195,21 @@ void sendFrSkyData()
 {
 	counter++;
 	
-	if (counter == 25)			// Send 5000 ms frame
+	if (counter >= 25)			 // Send 5000 ms frame
 	{
 		frSky->sendFrSky05Hz(frSkySerial, dataProvider);
-#ifdef DEBUGFRSKY
-		frSky->printValues(frskyDebugSerial, dataProvider);
-#endif
 		counter = 0;
 	}
-	else if (counter == 5)		// Send 1000 ms frame
+	else if ((counter % 5) == 0) // Send 1000 ms frame
 	{
 		frSky->sendFrSky1Hz(frSkySerial, dataProvider);
-#ifdef DEBUGFRSKY
-		frSky->printValues(frskyDebugSerial, dataProvider);
+#ifdef DEBUG
+		frSky->printValues(debugSerial, dataProvider);
 #endif
 	}
-	else						// Send 200 ms frame
+	else						 // Send 200 ms frame
 	{
 		frSky->sendFrSky5Hz(frSkySerial, dataProvider);
-#ifdef DEBUGFRSKY
-		frSky->printValues(frskyDebugSerial, dataProvider);
-#endif
 	}	
 }
 
@@ -226,19 +226,14 @@ void processData()
 			debugSerial->println("First parse done. Start sending on frSky port.");
 #endif
 		}
-
-#ifdef DEBUG
-		if (done && firstParse)
-			frSky->printValues(debugSerial, dataProvider);
-#endif
 	}
 }
 
 
 int freeRam () {
-  extern int __heap_start, *__brkval; 
-  int v; 
-  return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
+	extern int __heap_start, *__brkval; 
+	int v; 
+	return (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval); 
 }
 
 
