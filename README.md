@@ -1,4 +1,4 @@
-APM-Simple-Telemetry-to-FrSky
+APM-Mavlink-to-FrSky
 =============================
-Code for reading simple telemetry data from the uart2 serial port of the APM2+ with a Arduino pro mini
+Code for reading Mavlink data from the uart2 serial port of the APM2+ with a Arduino pro mini
 and convert to FrSky telemetry protocol.

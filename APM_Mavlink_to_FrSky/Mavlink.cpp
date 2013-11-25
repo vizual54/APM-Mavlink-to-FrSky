@@ -73,7 +73,7 @@ const float Mavlink::getMainBatteryVoltage()
 
 const float Mavlink::getBatteryCurrent()
 {
-	return current / 100.0f;
+	return current / 1000.0f;
 }
 
 const int Mavlink::getFuelLevel()
@@ -223,8 +223,8 @@ bool Mavlink::parseMessage(char c)
                 apm_mav_system    = msg.sysid;
                 apm_mav_component = msg.compid;
                 apm_mav_type      = mavlink_msg_heartbeat_get_type(&msg);            
-                apmMode = (uint8_t)mavlink_msg_heartbeat_get_custom_mode(&msg);
-				apmBaseMode = mavlink_msg_heartbeat_get_base_mode(&msg);
+                apmMode			  = (unsigned int)mavlink_msg_heartbeat_get_custom_mode(&msg);
+				apmBaseMode		  = mavlink_msg_heartbeat_get_base_mode(&msg);
 
                 //if(getBit(base_mode,7)) motor_armed = 1;
                 //else motor_armed = 0;
