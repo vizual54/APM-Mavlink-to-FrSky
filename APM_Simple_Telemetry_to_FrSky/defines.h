@@ -102,6 +102,5 @@ typedef unsigned char byte;
 0x3B   Battery voltage decimal
 */
 
-
 #endif
 

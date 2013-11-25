@@ -29,9 +29,9 @@
 #include "FrSky.h"
 #include "SimpleFIFO.h"
 #include <GCS_MAVLink.h>
+
 #define HEARTBEATLED 13
 #define HEARTBEATFREQ 500
-
 
 // Do not enable both at the same time
 //#define DEBUG

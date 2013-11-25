@@ -15,12 +15,13 @@
 	You should have received a copy of the GNU General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#pragma once
+#ifndef mavlink_h
+#define mavlink_h
 
 #include "ifrskydataprovider.h"
 #include "SoftwareSerial.h"
 #include <FastSerial.h>
-#include <mavlink.h>
+//#include <mavlink.h>
 #include <GCS_MAVLink.h>
 //#include <../Libraries/GCS_MAVLink/GCS_MAVLink.h>
 //#include "../GCS_MAVLink/include/mavlink/v1.0/mavlink_types.h"
@@ -92,3 +93,5 @@ private:
 	float			accY;
 	float			accZ;
 };
+
+#endif
