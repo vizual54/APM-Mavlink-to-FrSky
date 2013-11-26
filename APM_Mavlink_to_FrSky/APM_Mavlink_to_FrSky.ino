@@ -108,7 +108,7 @@ void setup() {
 #endif
 
 	// Blink fast a couple of times to wait for the APM to boot
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < 250; i++)
 	{
 		if (i % 2)
 		{
