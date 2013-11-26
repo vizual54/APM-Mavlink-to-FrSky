@@ -31,15 +31,15 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h3>
-<a name="arducopter-mavlink-telemetry-to-frsky-taranis" class="anchor" href="#arducopter-mavlink-telemetry-to-frsky-taranis"><span class="octicon octicon-link"></span></a>Arducopter Mavlink telemetry to FrSky Taranis.</h3>
+        <h2>
+<a name="arducopter-mavlink-telemetry-to-frsky-taranis" class="anchor" href="#arducopter-mavlink-telemetry-to-frsky-taranis"><span class="octicon octicon-link"></span></a>Arducopter Mavlink telemetry to FrSky Taranis.</h2>
 
 <p>This project was created to get telemetry data from the APM down to my Taranis radio. Using an Arduino Pro mini we can read Mavlink data from the APM and translate this to the FrSky hub telemetry protocol. This means that this will only work with FrSky receivers that support the old telemetry protocol, D4R-II, D8R-XP etc. A S.Port implementation for the X8R will be implemented as soon as someone hacks the protocol.</p>
 
 <p>Download the latest hex for arduino pro mini <a href="https://github.com/vizual54/APM-Mavlink-to-FrSky/tree/master/Binaries">here</a></p>
 
-<h3>
-<a name="data-currently-sent-to-the-taranis-is" class="anchor" href="#data-currently-sent-to-the-taranis-is"><span class="octicon octicon-link"></span></a>Data currently sent to the Taranis is:</h3>
+<h2>
+<a name="data-currently-sent-to-the-taranis-is" class="anchor" href="#data-currently-sent-to-the-taranis-is"><span class="octicon octicon-link"></span></a>Data currently sent to the Taranis is:</h2>
 
 <p>Alt      Altitude from ARM point
 Rpm      Throttle out
@@ -60,13 +60,13 @@ AccY     Attitude roll
 AccZ     Attitude yaw
 Hdg      Heading</p>
 
-<h3>
-<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to use</h3>
+<h2>
+<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to use</h2>
 
 <p>There are two ways to use this. Either by enabling the UART2 port on the APM or by sharing the TX line with the 3DR radio.</p>
 
-<h2>
-<a name="using-uart2-port" class="anchor" href="#using-uart2-port"><span class="octicon octicon-link"></span></a>Using UART2 port</h2>
+<h3>
+<a name="using-uart2-port" class="anchor" href="#using-uart2-port"><span class="octicon octicon-link"></span></a>Using UART2 port</h3>
 
 <p>This way you dont have to connect with the 3dr radio to get the mavlink data going. The Arduino will make a mavlink rate request to the APM.
 This is done by modifying system.pde around line 149 to look like this(AC 3.1RC7).</p>
@@ -83,8 +83,8 @@ gcs3.init(hal.uartC);
 
 <p><img src="https://github.com/vizual54/APM-Mavlink-to-FrSky/blob/master/APM_UART2_to_D4R.jpg?raw=true" alt="APM UART2 to Arduino pro mini"></p>
 
-<h2>
-<a name="sharing-uart0-with-3dr-radio" class="anchor" href="#sharing-uart0-with-3dr-radio"><span class="octicon octicon-link"></span></a>Sharing UART0 with 3DR radio</h2>
+<h3>
+<a name="sharing-uart0-with-3dr-radio" class="anchor" href="#sharing-uart0-with-3dr-radio"><span class="octicon octicon-link"></span></a>Sharing UART0 with 3DR radio</h3>
 
 <p>This way you always have to connect with the 3dr radio to get data to the Taranis but you dont have to modify the code and build arducopter yourself.
 Here is how to connect it.
