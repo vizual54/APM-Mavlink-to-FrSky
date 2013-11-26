@@ -36,6 +36,8 @@
 
 <p>This project was created to get telemetry data from the APM down to my Taranis radio. Using an Arduino Pro mini we can read Mavlink data from the APM and translate this to the FrSky hub telemetry protocol. This means that this will only work with FrSky receivers that support the old telemetry protocol, D4R-II, D8R-XP etc. A S.Port implementation for the X8R will be implemented as soon as someone hacks the protocol.</p>
 
+<p>Download the latest hex for arduino pro mini <a href="https://github.com/vizual54/APM-Mavlink-to-FrSky/tree/master/Binaries">here</a></p>
+
 <h3>
 <a name="data-currently-sent-to-the-taranis-is" class="anchor" href="#data-currently-sent-to-the-taranis-is"><span class="octicon octicon-link"></span></a>Data currently sent to the Taranis is:</h3>
 
@@ -69,18 +71,17 @@ Hdg      Heading</p>
 <p>This way you dont have to connect with the 3dr radio to get the mavlink data going. The Arduino will make a mavlink rate request to the APM.
 This is done by modifying system.pde around line 149 to look like this(AC 3.1RC7).</p>
 
-<p><code>
-//#if CONFIG_HAL_BOARD != HAL_BOARD_APM2
+<p>//#if CONFIG_HAL_BOARD != HAL_BOARD_APM2
 // we have a 2nd serial port for telemetry on all boards except
 // APM2. We actually do have one on APM2 but it isn't necessary as
 // a MUX is used
 hal.uartC-&gt;begin(map_baudrate(g.serial3_baud, SERIAL3_BAUD), 128, 128);
 gcs3.init(hal.uartC);
-//#endif
-</code></p>
+//#endif</p>
 
-<p>A precompiled 3.1rc7 for quads can be found <a href="https://github.com/vizual54/APM-Mavlink-to-FrSky/tree/master/Binaries">here</a>
-<img src="https://github.com/vizual54/APM-Mavlink-to-FrSky/blob/master/APM_UART2_to_D4R.jpg?raw=true" alt="APM UART2 to Arduino pro mini"></p>
+<p>A precompiled 3.1rc7 for quads can be found <a href="https://github.com/vizual54/APM-Mavlink-to-FrSky/tree/master/Binaries">here</a></p>
+
+<p><img src="https://github.com/vizual54/APM-Mavlink-to-FrSky/blob/master/APM_UART2_to_D4R.jpg?raw=true" alt="APM UART2 to Arduino pro mini"></p>
 
 <h2>
 <a name="sharing-uart0-with-3dr-radio" class="anchor" href="#sharing-uart0-with-3dr-radio"><span class="octicon octicon-link"></span></a>Sharing UART0 with 3DR radio</h2>
