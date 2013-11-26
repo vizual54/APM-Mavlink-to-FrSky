@@ -62,9 +62,9 @@
 <li>AccZ:     Attitude yaw</li>
 <li>Hdg:      Heading</li>
 </ul><h2>
-<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to use</h2>
+<a name="how-to-connect" class="anchor" href="#how-to-connect"><span class="octicon octicon-link"></span></a>How to connect</h2>
 
-<p>There are two ways to use this. Either by enabling the UART2 port on the APM or by sharing the TX line with the 3DR radio.</p>
+<p>There are two ways to connect your arduino pro mini to the APM. Either by enabling the UART2 port on the APM or by sharing the TX line with the 3DR radio.</p>
 
 <h3>
 <a name="using-uart2-port" class="anchor" href="#using-uart2-port"><span class="octicon octicon-link"></span></a>Using UART2 port</h3>
@@ -88,7 +88,7 @@ gcs3.init(hal.uartC);
 <a name="sharing-uart0-with-3dr-radio" class="anchor" href="#sharing-uart0-with-3dr-radio"><span class="octicon octicon-link"></span></a>Sharing UART0 with 3DR radio</h3>
 
 <p>This way you always have to connect with the 3dr radio to get data to the Taranis but you dont have to modify the code and build arducopter yourself.
-Here is how to connect it.
+Here is one way to connect the arduino to the uart0 port to share the TX line with the 3dr radio. you can also split the TX line from the telemetry port of the APM.
 <img src="https://github.com/vizual54/APM-Mavlink-to-FrSky/blob/master/APM_UART0_to_D4R.jpg?raw=true" alt="APM UART0 to Arduino pro mini"></p>
       </section>
     </div>
